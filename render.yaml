@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: dsa-api
+    runtime: node
+    plan: free          # trocar para "starter" se quiser disco persistente
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true   # Render gera automaticamente um valor seguro
+      - key: FRONTEND_URL
+        value: https://seudominio.com.br   # ← alterar para seu domínio na Hostinger
+      - key: BASE_URL
+        value: https://dsa-api.onrender.com  # ← alterar após criar o serviço
+      - key: DATA_DIR
+        value: /var/data
+
+# ── Disco Persistente ─────────────────────────────────────
+# Descomente o bloco abaixo após fazer upgrade para plano pago
+# Os dados NeDB serão mantidos entre redeploys
+#
+# disk:
+#   name: dsa-data
+#   mountPath: /var/data
+#   sizeGB: 1

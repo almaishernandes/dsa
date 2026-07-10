@@ -1,0 +1,10 @@
+{"_id":"trail_1","code":1,"name":"Liturgia e Objetos Sagrados","desc":"Celebração da Missa, vasos sagrados, vestes e ritos litúrgicos.","icon":"✝","createdAt":1781519314989}
+{"_id":"trail_10","code":10,"name":"Moral e Ética Cristã","desc":"Mandamentos, virtudes, Doutrina Social da Igreja e ética cristã.","icon":"🏆","createdAt":1781519315004}
+{"_id":"trail_2","code":2,"name":"Tempos e Calendário Litúrgico","desc":"Advento, Natal, Quaresma, Páscoa, Tempo Comum e o Ano Litúrgico.","icon":"📅","createdAt":1781519314994}
+{"_id":"trail_3","code":3,"name":"Sacramentos e Sacramentais","desc":"Os sete sacramentos e os sacramentais da Igreja Católica.","icon":"💧","createdAt":1781519314996}
+{"_id":"trail_4","code":4,"name":"Doutrina e Dogmas","desc":"Fundamentos da fé: Credo, Trindade, Mariologia e ensinamentos da Igreja.","icon":"📜","createdAt":1781519314997}
+{"_id":"trail_5","code":5,"name":"Vida dos Santos","desc":"Hagiografia, padroeiros, mártires e a comunhão dos santos.","icon":"⭐","createdAt":1781519314998}
+{"_id":"trail_6","code":6,"name":"Sagradas Escrituras","desc":"Livros bíblicos, personagens, passagens e a Palavra de Deus.","icon":"📖","createdAt":1781519314999}
+{"_id":"trail_7","code":7,"name":"História da Igreja","desc":"Concílios, papas, mártires e a história da Igreja ao longo dos séculos.","icon":"⛪","createdAt":1781519315000}
+{"_id":"trail_8","code":8,"name":"Arte e Simbolismo Sacro","desc":"Iconografia, arquitetura sacra e o rico simbolismo cristão.","icon":"🎨","createdAt":1781519315003}
+{"_id":"trail_9","code":9,"name":"Oração e Espiritualidade","desc":"Formas de oração, contemplação, Rosário e a vida espiritual cristã.","icon":"🕊","createdAt":1781519315004}

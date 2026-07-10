@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSA — Desafio dos Servidores do Altar</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0B0810;--bg-card:#160D1E;--bg-input:#1E1228;
+  --wine:#731828;--wine-l:#9B2438;--wine-xl:#C03050;
+  --gold:#C8A84B;--gold-l:#E5C96A;
+  --ice:#F0EDE6;--dim:#8A7C6E;--dim2:#5A4E48;
+  --success:#1E6B40;--success-l:#25994F;
+  --error:#8C1515;--error-l:#C02020;
+  --border:#2D1840;--border2:#3D2450;
+  --r:12px;--r-sm:8px;--r-xs:6px;
+  --shadow:0 8px 32px rgba(0,0,0,.6);
+  --t:.2s ease;
+}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ice);min-height:100vh;line-height:1.5;overflow-x:hidden}
+#app{min-height:100vh;display:flex;flex-direction:column}
+.serif{font-family:Georgia,'Times New Roman',serif}
+.gold{color:var(--gold)}
+.dim{color:var(--dim)}
+.screen{min-height:100vh;display:flex;flex-direction:column;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.ctr{width:100%;max-width:640px;margin:0 auto;padding:0 16px}
+
+/* CARD */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r);padding:24px;box-shadow:var(--shadow)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 22px;border-radius:var(--r-sm);border:none;cursor:pointer;font-size:15px;font-weight:600;transition:var(--t);text-decoration:none;font-family:inherit}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--wine);color:var(--ice)}
+.btn-primary:hover{background:var(--wine-l)}
+.btn-gold{background:var(--gold);color:#1A0A00}
+.btn-gold:hover{background:var(--gold-l)}
+.btn-ghost{background:transparent;color:var(--dim);border:1px solid var(--border2)}
+.btn-ghost:hover{color:var(--ice);border-color:var(--dim2)}
+.btn-danger{background:transparent;color:#F87171;border:1px solid var(--error)}
+.btn-danger:hover{background:var(--error);color:var(--ice)}
+.btn-full{width:100%}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* FORM */
+.fg{margin-bottom:16px}
+.fl{display:block;margin-bottom:6px;font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
+input,select{width:100%;padding:12px 16px;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--ice);font-size:15px;outline:none;transition:var(--t);font-family:inherit}
+input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,168,75,.15)}
+select option{background:var(--bg-card)}
+
+/* PROGRESS */
+.prog-track{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--wine),var(--gold));border-radius:3px;transition:width .4s ease}
+
+/* BADGE */
+.badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600}
+.b-wine{background:rgba(115,24,40,.3);color:var(--gold);border:1px solid var(--wine)}
+.b-gold{background:rgba(200,168,75,.15);color:var(--gold);border:1px solid var(--gold)}
+.b-ok{background:rgba(30,107,64,.3);color:#4ADE80;border:1px solid var(--success-l)}
+.b-err{background:rgba(140,21,21,.3);color:#F87171;border:1px solid var(--error)}
+
+/* ANSWER BUTTONS */
+.ans-btn{width:100%;padding:15px 18px;background:var(--bg-input);border:2px solid var(--border);border-radius:var(--r-sm);color:var(--ice);font-size:15px;text-align:left;cursor:pointer;transition:var(--t);margin-bottom:10px;display:flex;align-items:flex-start;gap:12px;font-family:inherit;line-height:1.5}
+.ans-btn:hover:not(:disabled){border-color:var(--gold);background:rgba(200,168,75,.08)}
+.ans-btn:disabled{cursor:default}
+.ans-btn .ltr{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;border-radius:50%;background:var(--border2);font-size:13px;font-weight:700;color:var(--dim);flex-shrink:0;transition:var(--t)}
+.ans-btn.correct{border-color:var(--success-l);background:rgba(30,107,64,.2);animation:pulse-ok .4s ease}
+.ans-btn.correct .ltr{background:var(--success-l);color:#fff}
+.ans-btn.wrong{border-color:var(--error-l);background:rgba(140,21,21,.2);animation:shake .3s ease}
+.ans-btn.wrong .ltr{background:var(--error);color:#fff}
+.ans-btn.dimmed{opacity:.35}
+@keyframes pulse-ok{0%{transform:scale(1)}50%{transform:scale(1.015)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* FEEDBACK BOX */
+.fb{padding:14px 16px;border-radius:var(--r-sm);font-size:14px;margin-top:12px;line-height:1.6}
+.fb.err{background:rgba(140,21,21,.2);border:1px solid var(--error);color:#FCA5A5}
+.fb.ok{background:rgba(30,107,64,.2);border:1px solid var(--success-l);color:#86EFAC}
+
+/* QUIZ HEADER */
+.qhdr{background:var(--bg-card);border-bottom:1px solid var(--border);padding:12px 0;position:sticky;top:0;z-index:10}
+.qmeta{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:13px}
+.qtimer{font-family:'Courier New',monospace;font-size:17px;color:var(--gold);font-weight:700}
+.qscore{font-size:17px;font-weight:700;color:var(--gold)}
+.qval{display:inline-block;padding:4px 12px;background:rgba(200,168,75,.15);border:1px solid var(--gold);border-radius:99px;color:var(--gold);font-size:13px;font-weight:700}
+
+/* STAGE CARDS */
+.stage-grid{display:flex;flex-direction:column;gap:10px;padding:20px 0 32px}
+.stage-row{display:flex;gap:10px}
+.stage-row.rev{flex-direction:row-reverse}
+.sc{flex:1;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;transition:var(--t);position:relative;overflow:hidden}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:transparent;transition:var(--t)}
+.sc:hover:not(.locked){transform:translateY(-2px);border-color:var(--gold)}
+.sc.locked{opacity:.45;cursor:not-allowed}
+.sc.done{border-color:var(--success-l)}
+.sc.done::before{background:var(--success-l)}
+.sc.avail{border-color:var(--wine)}
+.sc.avail::before{background:linear-gradient(90deg,var(--wine),var(--gold))}
+.sc-num{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
+.sc-ttl{font-family:Georgia,serif;font-size:13px;color:var(--ice);font-weight:600;line-height:1.3}
+.sc-ico{font-size:18px;margin-bottom:6px}
+
+/* STAT GRID */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.stat-box{background:var(--bg-input);border:1px solid var(--border);border-radius:var(--r-sm);padding:16px;text-align:center}
+.stat-v{font-size:28px;font-weight:700;font-family:Georgia,serif;color:var(--gold)}
+.stat-l{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;margin-top:4px}
+
+/* RANK */
+.rank-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--border)}
+.rank-pos{font-size:16px;font-weight:700;font-family:Georgia,serif;min-width:36px;text-align:center}
+
+/* DASH HEADER */
+.dhdr{background:linear-gradient(180deg,rgba(115,24,40,.6) 0%,transparent 100%);padding:28px 0 20px;border-bottom:1px solid var(--border)}
+
+/* SKIP BAR */
+.skip-bar{position:fixed;bottom:0;left:0;right:0;padding:10px 16px 16px;background:linear-gradient(0deg,var(--bg) 70%,transparent);display:flex;justify-content:center;z-index:9}
+
+/* DIVIDER */
+.div{height:1px;background:var(--border);margin:18px 0}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+@media(max-width:480px){
+  .stat-grid{grid-template-columns:1fr}
+  .card{padding:16px}
+  .sc-ttl{font-size:12px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ─── CONSTANTS ────────────────────────────────────────────────
+const QPE = 5;           // Questions per stage (set 100 in production)
+const N_STAGES = 10;
+const SKIP_PEN = 10;
+const BASE_VAL = 10;
+const PASS_THR = 50;     // % first-attempt correct to pass
+
+const STAGE_NAMES = [
+  'A Chamada','A Veste','O Altar','A Liturgia da Palavra',
+  'A Liturgia Eucarística','Os Sacramentos','O Calendário Litúrgico',
+  'Os Santos','A Doutrina','O Testemunho'
+];
+const STAGE_ICONS = ['✝','☩','⛪','📖','🕊','💧','📅','⭐','📜','🏆'];
+const LETTERS = ['A','B','C','D'];
+
+// ─── MOCK QUESTIONS ───────────────────────────────────────────
+const ALL_Q = [
+  {
+    id:1, theme:'Objetos Sagrados',
+    q:'Qual é o nome do vaso sagrado utilizado na Missa para conter o vinho que, após a Consagração, se torna o Sangue de Cristo?',
+    opts:['Píxide','Cálice','Ostensório','Âmbula'],
+    ans:1,
+    exp:'O <strong>Cálice</strong> é o vaso litúrgico que contém o vinho que, pela ação consagratória do sacerdote, se transforma no precioso Sangue de Nosso Senhor Jesus Cristo. É feito de material nobre e é um dos objetos mais sagrados da liturgia católica.'
+  },
+  {
+    id:2, theme:'Objetos Sagrados',
+    q:'A Patena é um objeto litúrgico fundamental. Qual é a sua função principal durante a Santa Missa?',
+    opts:['Conter o vinho a ser consagrado','Guardar as relíquias dos santos no altar','Sustentar a Hóstia durante a celebração da Eucaristia','Ser utilizada para aspergir a água benta'],
+    ans:2,
+    exp:'A <strong>Patena</strong> é um prato circular, geralmente dourado ou prateado, que serve para sustentar a Hóstia (o pão) durante a Santa Missa. Ela é colocada sobre o Cálice e é um dos vasos sagrados essenciais do altar.'
+  },
+  {
+    id:3, theme:'Tempos Litúrgicos',
+    q:'Qual é o tempo litúrgico que prepara a Igreja para a celebração do Natal, marcado pela cor roxa e pela expectativa da vinda do Senhor?',
+    opts:['Quaresma','Pentecostes','Advento','Tempo Comum'],
+    ans:2,
+    exp:'O <strong>Advento</strong> é o tempo litúrgico de preparação para o Natal. "Advento" vem do latim <em>adventus</em> ("vinda"). É marcado pela cor roxa, pelo espírito de oração e expectativa, com início quatro domingos antes do Natal.'
+  },
+  {
+    id:4, theme:'Tempos Litúrgicos',
+    q:'Qual é a cor litúrgica utilizada durante a Quaresma, o período de 40 dias de penitência que precede a Páscoa?',
+    opts:['Branco','Verde','Roxo/Violeta','Vermelho'],
+    ans:2,
+    exp:'A cor litúrgica da <strong>Quaresma</strong> é o <strong>Roxo/Violeta</strong>, que simboliza penitência, conversão e preparação espiritual. A Quaresma começa na Quarta-Feira de Cinzas e dura 40 dias, em memória dos 40 dias de jejum de Jesus no deserto.'
+  },
+  {
+    id:5, theme:'Liturgia',
+    q:'O que é o Turíbulo, um dos objetos que o coroinha frequentemente maneja durante as celebrações solenes?',
+    opts:['O livro utilizado pelo sacerdote durante a Missa','O recipiente que guarda as hóstias consagradas','O incensário utilizado nas celebrações litúrgicas para queimar incenso','A toalha utilizada para cobrir o altar'],
+    ans:2,
+    exp:'O <strong>Turíbulo</strong> (ou incensário) é um recipiente de metal suspenso por correntes, usado para queimar incenso durante as celebrações. O incenso simboliza a oração que sobe a Deus. O coroinha responsável pelo turíbulo é chamado de <strong>turiferário</strong>.'
+  },
+  {
+    id:6, theme:'Vida dos Santos',
+    q:'Quem é o santo mártir considerado o Padroeiro dos Coroinhas, que morreu no século III defendendo a Eucaristia?',
+    opts:['São João Bosco','São Francisco de Assis','São Domingos Sávio','São Tarcísio'],
+    ans:3,
+    exp:'<strong>São Tarcísio</strong> é o Padroeiro dos Coroinhas. Segundo a tradição, era um jovem acólito romano que, no século III, foi martirizado por pagãos que tentavam roubar as hóstias consagradas que ele transportava. Preferiu morrer a entregar o Corpo de Cristo.'
+  },
+  {
+    id:7, theme:'Doutrina',
+    q:'O que significa a palavra hebraica "Amém", proclamada ao final das orações na liturgia católica?',
+    opts:['Louvo a Deus com todo meu ser','Assim seja / Verdadeiramente, é assim','Tenho fé e esperança','Glória ao Pai e ao Filho'],
+    ans:1,
+    exp:'"<strong>Amém</strong>" vem do hebraico e significa "Assim seja", "É verdade" ou "Eu afirmo". Ao dizer "Amém", o fiel ratifica e une-se à oração proclamada, tornando-a sua. No Apocalipse, Jesus é chamado de "o Amém, o testemunho fiel e verdadeiro" (Ap 3,14).'
+  },
+  {
+    id:8, theme:'Objetos Sagrados',
+    q:'Qual é a veste litúrgica longa e estreita, usada pelo sacerdote sobre os ombros, que simboliza a autoridade ministerial?',
+    opts:['O Véu Umeral','A Estola','O Pluvial','A Casula'],
+    ans:1,
+    exp:'A <strong>Estola</strong> é uma veste litúrgica em forma de faixa longa e estreita, usada pelo sacerdote sobre os ombros, simbolizando a autoridade e a graça sacerdotal. Somente ministros ordenados (diáconos, presbíteros e bispos) podem usá-la.'
+  },
+  {
+    id:9, theme:'Liturgia',
+    q:'Em qual momento da Santa Missa ocorre a Consagração, quando o pão e o vinho se tornam o Corpo e Sangue de Cristo?',
+    opts:['Durante a Liturgia da Palavra, após o Evangelho','Na Procissão de Entrada, ao chegar ao altar','Na Liturgia Eucarística, dentro da Oração Eucarística (Cânon)','No Rito de Comunhão, antes da distribuição'],
+    ans:2,
+    exp:'A <strong>Consagração</strong> ocorre na <strong>Liturgia Eucarística</strong>, dentro da Oração Eucarística (Cânon). O sacerdote pronuncia as palavras de Jesus na Última Ceia e, pela ação do Espírito Santo, o pão e o vinho são transformados no Corpo e Sangue de Cristo.'
+  },
+  {
+    id:10, theme:'Objetos Sagrados',
+    q:'O que é o Ostensório (ou Custódia), utilizado nas celebrações da Adoração ao Santíssimo Sacramento?',
+    opts:['O livro litúrgico com as orações da Missa','O recipiente que guarda os santos óleos','O vaso sagrado que expõe a Hóstia Consagrada para adoração dos fiéis','O suporte metálico onde fica o Evangeliário'],
+    ans:2,
+    exp:'O <strong>Ostensório</strong> (do latim <em>ostendere</em>, mostrar) é o vaso sagrado usado para expor a Hóstia Consagrada à adoração dos fiéis. Geralmente tem formato de sol radiante, simbolizando Cristo como "Luz do mundo". É usado na Bênção do Santíssimo e em procissões eucarísticas.'
+  },
+  {
+    id:11, theme:'Liturgia',
+    q:'Qual é o livro litúrgico que contém todas as orações, prefácios e cânones utilizados pelo sacerdote para celebrar a Santa Missa?',
+    opts:['Breviário','Saltério','Lecionário','Missal Romano'],
+    ans:3,
+    exp:'O <strong>Missal Romano</strong> contém todas as orações, prefácios e ritos para a celebração da Santa Missa. O <em>Lecionário</em> contém as leituras bíblicas, e o <em>Breviário</em> (Liturgia das Horas) contém as orações diárias dos clérigos e religiosos.'
+  },
+  {
+    id:12, theme:'Tempos Litúrgicos',
+    q:'Qual é o centro de todo o Ano Litúrgico, considerado o fundamento de toda a fé cristã?',
+    opts:['O Natal','O Advento','A Páscoa','O Pentecostes'],
+    ans:2,
+    exp:'A <strong>Páscoa</strong> é o centro e ápice do Ano Litúrgico e de toda a fé cristã. A Ressurreição de Jesus é o fundamento do Evangelho (1Cor 15,14). O Tempo Pascal dura 50 dias até Pentecostes e é o período de maior alegria na Igreja — são João Paulo II a chamou de "a festa das festas".'
+  },
+  {
+    id:13, theme:'Objetos Sagrados',
+    q:'O que é o Píxide (ou Cibório), frequentemente guardado no sacrário?',
+    opts:['O sino tocado durante a Consagração','O recipiente sagrado onde são guardadas as Hóstias consagradas para os fiéis e enfermos','O pano com que se limpa o cálice após a Comunhão','O suporte dourado em que repousa a patena'],
+    ans:1,
+    exp:'O <strong>Píxide</strong> (ou Cibório) é o vaso sagrado, semelhante a um cálice com tampa, usado para guardar e distribuir as Hóstias Consagradas. Quando não está em uso, é guardado no <strong>Sacrário</strong>, onde Cristo está realmente presente — por isso fazemos genuflexão diante dele.'
+  },
+  {
+    id:14, theme:'Doutrina',
+    q:'O que é a Transubstanciação, doutrina central da fé católica sobre a Eucaristia?',
+    opts:['A mudança espiritual que ocorre no fiel ao receber a Comunhão','A transformação real da substância do pão e do vinho em Corpo e Sangue de Cristo, permanecendo só as aparências externas','A representação simbólica do sacrifício de Cristo na Missa','O processo de preparação das hóstias antes da Missa'],
+    ans:1,
+    exp:'A <strong>Transubstanciação</strong> afirma que, na Consagração, a <em>substância</em> do pão e do vinho se converte na substância do Corpo e Sangue de Cristo, permanecendo apenas as aparências (acidentes) do pão e do vinho. Cristo está real, verdadeira e substancialmente presente — não apenas simbolicamente.'
+  },
+  {
+    id:15, theme:'Liturgia',
+    q:'O que é a Genuflexão, gesto praticado pelos servidores do altar ao passarem diante do sacrário?',
+    opts:['A inclinação da cabeça ao ouvir o nome de Jesus','O ato de dobrar o joelho direito até o chão como sinal de adoração à presença real de Cristo','O sinal da cruz feito com água benta ao entrar na Igreja','A prostração completa no chão realizada na Sexta-Feira Santa'],
+    ans:1,
+    exp:'A <strong>Genuflexão</strong> é o ato de dobrar o joelho direito até o chão, em sinal de adoração à presença real de Jesus Cristo no Santíssimo Sacramento. Fazemos genuflexão ao passar diante do sacrário quando o Santíssimo está presente — é um gesto de fé profunda na Eucaristia.'
+  }
+];
+
+// ─── MOCK USERS ───────────────────────────────────────────────
+const MOCK_USERS = [
+  {
+    id:'mock1', name:'Maria Eduarda Fonseca', parish:'Comunidade Sagrado Coração', role:'coroinha',
+    stageProgress:[
+      {done:true,score:94,far:92,time:356},{done:true,score:88,far:84,time:478},
+      {done:true,score:96,far:94,time:312},{done:true,score:81,far:78,time:522},
+      ...Array(6).fill(null).map(()=>({done:false,score:0,far:0,time:0}))
+    ],
+    totalScore:359, totalTime:1668
+  },
+  {
+    id:'mock2', name:'Gabriel Mendes', parish:'Paróquia São José', role:'acolito',
+    stageProgress:[
+      {done:true,score:87,far:82,time:423},{done:true,score:79,far:76,time:511},
+      {done:true,score:91,far:88,time:387},
+      ...Array(7).fill(null).map(()=>({done:false,score:0,far:0,time:0}))
+    ],
+    totalScore:257, totalTime:1321
+  },
+  {
+    id:'mock3', name:'Lucas Ribeiro', parish:'Paróquia N. Sra. Aparecida', role:'coroinha',
+    stageProgress:[
+      {done:true,score:73,far:68,time:612},{done:true,score:65,far:60,time:698},
+      ...Array(8).fill(null).map(()=>({done:false,score:0,far:0,time:0}))
+    ],
+    totalScore:138, totalTime:1310
+  }
+];
+
+// ─── STATE ────────────────────────────────────────────────────
+let S = {
+  screen:'login',
+  user:null,
+  allUsers:JSON.parse(JSON.stringify(MOCK_USERS)),
+  stageIdx:0,
+  quiz:null,
+  result:null
+};
+
+// ─── UTILS ────────────────────────────────────────────────────
+function fmtTime(s){
+  return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+}
+function shuffle(a){
+  const b=[...a];
+  for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}
+  return b;
+}
+function getQs(idx){
+  // All questions reused across stages for demo (production: filter by stage)
+  return shuffle(ALL_Q).slice(0,QPE);
+}
+function ranking(){
+  const list=[...S.allUsers];
+  if(S.user){
+    const ex=list.find(u=>u.id===S.user.id);
+    if(!ex)list.push(S.user); else Object.assign(ex,S.user);
+  }
+  return list.sort((a,b)=>b.totalScore!==a.totalScore?b.totalScore-a.totalScore:a.totalTime-b.totalTime);
+}
+
+// ─── NAVIGATION ──────────────────────────────────────────────
+function go(scr){
+  stopTimer();
+  S.screen=scr;
+  render();
+  window.scrollTo(0,0);
+}
+
+// ─── QUIZ LOGIC ──────────────────────────────────────────────
+function startStage(idx){
+  S.stageIdx=idx;
+  S.quiz={
+    idx, qs:getQs(idx), ci:0,
+    val:BASE_VAL, attempts:0,
+    score:0, fa:0,
+    timer:0, iv:null,
+    phase:'q', // 'q'=question | 'ok'=correct | 'err'=wrong
+    lastWrong:-1,
+    wrongTO:null
+  };
+  go('quiz');
+  startTimer();
+}
+
+function startTimer(){
+  if(S.quiz.iv)clearInterval(S.quiz.iv);
+  S.quiz.iv=setInterval(()=>{
+    S.quiz.timer++;
+    const el=document.getElementById('qtimer');
+    if(el)el.textContent=fmtTime(S.quiz.timer);
+  },1000);
+}
+function stopTimer(){
+  if(S.quiz&&S.quiz.iv){clearInterval(S.quiz.iv);S.quiz.iv=null;}
+}
+
+function pick(i){
+  const q=S.quiz;
+  if(q.phase==='ok')return;
+  const cur=q.qs[q.ci];
+  if(i===cur.ans){
+    q.phase='ok';
+    if(q.attempts===0)q.fa++;
+    q.score+=q.val;
+    qUpdate();
+  } else {
+    if(q.wrongTO)clearTimeout(q.wrongTO);
+    q.phase='err';
+    q.attempts++;
+    q.lastWrong=i;
+    q.val=Math.max(0,BASE_VAL-q.attempts);
+    qUpdate();
+    q.wrongTO=setTimeout(()=>{
+      if(S.quiz&&S.quiz.phase==='err'&&S.screen==='quiz'){
+        S.quiz.phase='q';
+        qUpdate();
+      }
+    },1600);
+  }
+}
+
+function skip(){
+  const q=S.quiz;
+  if(q.phase==='ok')return;
+  if(q.wrongTO){clearTimeout(q.wrongTO);q.wrongTO=null;}
+  q.score-=SKIP_PEN;
+  advance();
+}
+
+function next(){advance();}
+
+function advance(){
+  const q=S.quiz;
+  q.val=BASE_VAL;q.attempts=0;q.lastWrong=-1;q.phase='q';q.wrongTO=null;
+  q.ci++;
+  if(q.ci>=q.qs.length){endStage();}
+  else{qUpdate();window.scrollTo(0,0);}
+}
+
+function endStage(){
+  stopTimer();
+  const q=S.quiz;
+  const far=(q.fa/q.qs.length)*100;
+  const passed=far>PASS_THR;
+  S.result={idx:q.idx,score:q.score,far,passed,time:q.timer,fa:q.fa,total:q.qs.length};
+  if(passed&&S.user){
+    const p=S.user.stageProgress[q.idx];
+    if(!p.done||q.score>p.score){
+      S.user.stageProgress[q.idx]={done:true,score:q.score,far,time:q.timer};
+    }
+    S.user.totalScore=S.user.stageProgress.reduce((s,x)=>s+x.score,0);
+    S.user.totalTime=S.user.stageProgress.reduce((s,x)=>s+x.time,0);
+  }
+  go('stageEnd');
+}
+
+// Partial quiz re-render (avoids full screen re-mount & timer reset)
+function qUpdate(){
+  const el=document.getElementById('qinner');
+  if(el)el.innerHTML=qInner();
+  const se=document.getElementById('qscore');
+  if(se)se.textContent=S.quiz.score+' pts';
+  const pct=(S.quiz.ci/S.quiz.qs.length)*100;
+  const pf=document.getElementById('qprog');
+  if(pf)pf.style.width=pct+'%';
+}
+
+// ─── SCREEN: LOGIN ────────────────────────────────────────────
+function rLogin(){
+  return`<div class="screen" style="justify-content:center;align-items:center;padding:24px;background:radial-gradient(ellipse at top,rgba(115,24,40,.25) 0%,transparent 60%)">
+  <div class="ctr" style="max-width:420px">
+    <div style="text-align:center;padding:36px 0 28px">
+      <div style="font-size:52px;color:var(--gold);text-shadow:0 0 30px rgba(200,168,75,.4);margin-bottom:12px">✝</div>
+      <h1 class="serif gold" style="font-size:30px;letter-spacing:.08em;margin-bottom:6px">DSA</h1>
+      <p class="serif" style="font-size:12px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase">Desafio dos Servidores do Altar</p>
+    </div>
+    <div class="card">
+      <h2 class="serif" style="font-size:20px;margin-bottom:4px">Bem-vindo, Servidor</h2>
+      <p style="font-size:14px;color:var(--dim);margin-bottom:22px">Identifique-se para participar do Desafio</p>
+      <form id="lf">
+        <div class="fg"><label class="fl">Nome do Servidor</label>
+          <input id="in" type="text" placeholder="Seu nome completo" required maxlength="60"></div>
+        <div class="fg"><label class="fl">Paróquia / Comunidade</label>
+          <input id="ip" type="text" placeholder="Nome da sua paróquia" required maxlength="80"></div>
+        <div class="fg"><label class="fl">Você é</label>
+          <select id="ir"><option value="">Selecione...</option>
+            <option value="coroinha">Coroinha</option>
+            <option value="acolito">Acólito</option></select></div>
+        <div id="lerr" style="display:none;color:#FCA5A5;font-size:13px;margin-bottom:10px"></div>
+        <button type="submit" class="btn btn-gold btn-full" style="font-size:16px;padding:14px;margin-top:4px">
+          Iniciar Jornada &nbsp;✝</button>
+      </form>
+    </div>
+    <p style="text-align:center;font-size:12px;color:var(--dim2);margin-top:20px">
+      "Felizes os que habitam na tua casa, Senhor!" — Sl 84,5</p>
+  </div>
+</div>`;
+}
+
+// ─── SCREEN: DASHBOARD ───────────────────────────────────────
+function rDash(){
+  const u=S.user;
+  const rl=u.role==='acolito'?'Acólito':'Coroinha';
+  let rows='';
+  for(let r=0;r<5;r++){
+    const s1=r*2,s2=r*2+1;
+    const rev=r%2===1;
+    rows+=`<div class="stage-row ${rev?'rev':''}">${sCard(s1)}${sCard(s2)}</div>`;
+  }
+  const doneCount=u.stageProgress.filter(p=>p.done).length;
+  const pct=Math.round(doneCount/N_STAGES*100);
+  return`<div class="screen">
+  <div class="dhdr">
+    <div class="ctr">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <p style="font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em">${rl}</p>
+          <h1 class="serif" style="font-size:22px">${u.name}</h1>
+          <p style="font-size:13px;color:var(--dim)">${u.parish}</p>
+        </div>
+        <div style="text-align:right">
+          <p style="font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em">Pontuação Geral</p>
+          <p class="gold serif" style="font-size:34px;font-weight:700;line-height:1">${u.totalScore}</p>
+          <p style="font-size:11px;color:var(--dim)">pontos</p>
+        </div>
+      </div>
+      <div style="margin-top:16px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--dim);margin-bottom:5px">
+          <span>Progresso geral</span><span>${doneCount}/${N_STAGES} etapas</span>
+        </div>
+        <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="ctr" style="padding-bottom:40px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:20px 0 6px">
+      <h2 class="serif" style="font-size:18px">Trilha das Etapas</h2>
+      <button class="btn btn-ghost" style="font-size:13px;padding:8px 14px" onclick="go('ranking')">🏆 Ranking</button>
+    </div>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:4px">Complete cada etapa com &gt;50% de acertos de primeira tentativa para avançar</p>
+    <div class="stage-grid">${rows}</div>
+  </div>
+</div>`;
+}
+
+function sCard(i){
+  if(i>=N_STAGES)return`<div style="flex:1"></div>`;
+  const u=S.user,p=u.stageProgress[i];
+  const done=p.done;
+  const unlocked=i===0||u.stageProgress[i-1].done;
+  const avail=unlocked&&!done;
+  const locked=!unlocked;
+  const cls=`sc ${done?'done':avail?'avail':'locked'}`;
+  const click=!locked?`onclick="startStage(${i})"`:'';
+  return`<div class="${cls}" ${click}>
+    <div class="sc-ico">${locked?'🔒':done?'✅':STAGE_ICONS[i]}</div>
+    <div class="sc-num">Etapa ${i+1}</div>
+    <div class="sc-ttl">${STAGE_NAMES[i]}</div>
+    ${done?`<div style="margin-top:7px"><span class="badge b-ok" style="font-size:11px">${p.score}pts</span>
+      <span class="badge b-wine" style="font-size:11px;margin-left:3px">${Math.round(p.far)}%</span></div>`
+    :avail?`<div style="margin-top:7px"><span class="badge b-wine" style="font-size:11px">Disponível</span></div>`:''}
+  </div>`;
+}
+
+// ─── SCREEN: QUIZ ────────────────────────────────────────────
+function rQuiz(){
+  const q=S.quiz;
+  const pct=(q.ci/q.qs.length)*100;
+  return`<div class="screen">
+  <div class="qhdr">
+    <div class="ctr">
+      <div class="qmeta">
+        <span class="serif gold" style="font-size:14px">${STAGE_NAMES[q.idx]}</span>
+        <span id="qtimer" class="qtimer">${fmtTime(q.timer)}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="flex:1">
+          <div class="prog-track"><div id="qprog" class="prog-fill" style="width:${pct}%"></div></div>
+        </div>
+        <span style="font-size:13px;color:var(--dim);white-space:nowrap">${q.ci+1}/${q.qs.length}</span>
+        <span id="qscore" class="qscore">${q.score} pts</span>
+      </div>
+    </div>
+  </div>
+  <div class="ctr" style="flex:1;padding-top:18px;padding-bottom:80px">
+    <div id="qinner">${qInner()}</div>
+  </div>
+  <div class="skip-bar">
+    <div style="width:100%;max-width:640px">
+      <button class="btn btn-danger btn-full" onclick="doSkip()" style="font-size:14px">
+        ⏭ Pular Questão &nbsp;<span style="opacity:.7">(-${SKIP_PEN} pts)</span>
+      </button>
+    </div>
+  </div>
+</div>`;
+}
+
+function qInner(){
+  const q=S.quiz;
+  const cur=q.qs[q.ci];
+  let opts='';
+  cur.opts.forEach((o,i)=>{
+    let cls='ans-btn';
+    let dis='';
+    if(q.phase==='ok'){
+      if(i===cur.ans)cls+=' correct';
+      else cls+=' dimmed';
+      dis='disabled';
+    } else if(q.phase==='err'){
+      if(i===q.lastWrong)cls+=' wrong';
+      dis='disabled';
+    }
+    opts+=`<button class="${cls}" ${dis} onclick="pick(${i})">
+      <span class="ltr">${LETTERS[i]}</span><span>${o}</span></button>`;
+  });
+  let fb='';
+  if(q.phase==='err'){
+    fb=`<div class="fb err">✗ &nbsp;Resposta incorreta! &nbsp;<strong>Tente novamente — a questão agora vale ${q.val} ponto${q.val!==1?'s':''}.</strong></div>`;
+  } else if(q.phase==='ok'){
+    const last=q.ci>=q.qs.length-1;
+    fb=`<div class="fb ok">
+      <strong>✓ Correto! +${q.val} ponto${q.val!==1?'s':''}!</strong>
+      <div style="margin-top:8px;font-size:13px;opacity:.9">${cur.exp}</div>
+    </div>
+    <div style="margin-top:14px">
+      <button class="btn btn-gold btn-full" onclick="${last?'endStage()':'next()'}" style="font-size:16px;padding:14px">
+        ${last?'✝ Finalizar Etapa':'Próxima Questão →'}</button>
+    </div>`;
+  }
+  return`<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <span class="badge b-wine">${cur.theme}</span>
+    <span class="qval">Vale ${q.val} pt${q.val!==1?'s':''}</span>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <p style="font-size:11px;color:var(--dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Questão ${q.ci+1}</p>
+    <p class="serif" style="font-size:17px;line-height:1.65">${cur.q}</p>
+  </div>
+  ${opts}${fb}`;
+}
+
+function doSkip(){
+  const q=S.quiz;
+  if(q.phase==='ok')return;
+  // Inline confirmation within the button area
+  const bar=document.querySelector('.skip-bar>div');
+  if(!bar)return;
+  if(!bar.dataset.confirm){
+    bar.dataset.confirm='1';
+    bar.innerHTML=`<div style="display:flex;gap:8px;align-items:center">
+      <span style="flex:1;font-size:13px;color:#F87171">Tem certeza? Custará ${SKIP_PEN} pontos!</span>
+      <button class="btn btn-danger" onclick="skip()" style="padding:10px 16px;font-size:13px">Confirmar</button>
+      <button class="btn btn-ghost" onclick="cancelSkip()" style="padding:10px 16px;font-size:13px">Cancelar</button>
+    </div>`;
+  }
+}
+
+function cancelSkip(){
+  const bar=document.querySelector('.skip-bar>div');
+  if(!bar)return;
+  delete bar.dataset.confirm;
+  bar.innerHTML=`<button class="btn btn-danger btn-full" onclick="doSkip()" style="font-size:14px">
+    ⏭ Pular Questão &nbsp;<span style="opacity:.7">(-${SKIP_PEN} pts)</span></button>`;
+}
+
+// ─── SCREEN: STAGE END ───────────────────────────────────────
+function rStageEnd(){
+  const r=S.result;
+  const last=r.idx>=N_STAGES-1;
+  const far=Math.round(r.far);
+  const barColor=r.passed?'linear-gradient(90deg,var(--success),var(--success-l))':'var(--error)';
+  return`<div class="screen">
+  <div class="ctr" style="padding-top:32px;padding-bottom:48px">
+    <div style="text-align:center;margin-bottom:16px">
+      <span class="badge ${r.passed?'b-ok':'b-err'}" style="font-size:14px;padding:6px 20px">
+        ${r.passed?'✓ APROVADO':'✗ REPROVADO'}</span>
+    </div>
+    <div style="font-size:64px;text-align:center;margin:16px 0">${r.passed?'🏆':'📜'}</div>
+    <h1 class="serif gold" style="font-size:24px;text-align:center;margin-bottom:8px">${STAGE_NAMES[r.idx]}</h1>
+    <p style="text-align:center;color:var(--dim);font-size:15px;margin-bottom:24px">
+      ${r.passed?(last?'Parabéns! Você completou todas as 10 etapas!':'Excelente! A próxima etapa está desbloqueada.')
+        :'Não desanime! Revise o conteúdo litúrgico e tente novamente.'}</p>
+    <div class="stat-grid">
+      <div class="stat-box"><div class="stat-v">${r.score}</div><div class="stat-l">Pontos Ganhos</div></div>
+      <div class="stat-box"><div class="stat-v">${fmtTime(r.time)}</div><div class="stat-l">Tempo Total</div></div>
+      <div class="stat-box"><div class="stat-v">${far}%</div><div class="stat-l">Acertos de 1ª</div></div>
+      <div class="stat-box"><div class="stat-v">${r.fa}/${r.total}</div><div class="stat-l">Certas (1ª Tent.)</div></div>
+    </div>
+    <div class="card" style="text-align:center;margin:4px 0 20px">
+      <p style="font-size:13px;color:var(--dim);margin-bottom:6px">Critério de aprovação — acertos de 1ª tentativa</p>
+      <p style="font-size:15px">Taxa obtida: <strong class="${r.passed?'gold':''}">${far}%</strong>
+        &nbsp;·&nbsp; Mínimo necessário: <strong>${PASS_THR+1}%</strong></p>
+      <div class="prog-track" style="margin-top:12px">
+        <div class="prog-fill" style="width:${Math.min(100,r.far)}%;background:${barColor}"></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${r.passed&&!last?`<button class="btn btn-gold btn-full" style="font-size:16px;padding:14px" onclick="startStage(${r.idx+1})">
+        Próxima Etapa: ${STAGE_NAMES[r.idx+1]} →</button>`:''}
+      ${!r.passed?`<button class="btn btn-primary btn-full" style="font-size:16px;padding:14px" onclick="startStage(${r.idx})">
+        ↺ Refazer Esta Etapa</button>`:''}
+      <button class="btn btn-ghost btn-full" onclick="go('dashboard')">Voltar ao Mapa de Etapas</button>
+      <button class="btn btn-ghost btn-full" onclick="go('ranking')">🏆 Ver Ranking Geral</button>
+    </div>
+  </div>
+</div>`;
+}
+
+// ─── SCREEN: RANKING ─────────────────────────────────────────
+function rRanking(){
+  const sorted=ranking();
+  const posSymbol=(i)=>{if(i===0)return'🥇';if(i===1)return'🥈';if(i===2)return'🥉';return`#${i+1}`;};
+  const rows=sorted.map((u,i)=>{
+    const mine=S.user&&u.id===S.user.id;
+    const done=u.stageProgress.filter(p=>p.done).length;
+    const rl=u.role==='acolito'?'Acólito':'Coroinha';
+    return`<div class="rank-row" style="${mine?'background:rgba(200,168,75,.06);border-radius:8px;padding:14px 8px;margin:0 -8px':''}">
+      <div class="rank-pos" style="${i<3?'font-size:24px':'color:var(--dim)'}">${posSymbol(i)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span style="font-weight:600;font-size:15px">${u.name}</span>
+          ${mine?'<span class="badge b-gold" style="font-size:10px">Você</span>':''}
+        </div>
+        <div style="font-size:12px;color:var(--dim);margin-top:2px">${rl} · ${u.parish}</div>
+        <div style="font-size:12px;color:var(--dim);margin-top:1px">${done} etapa${done!==1?'s':''} concluída${done!==1?'s':''}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div class="gold serif" style="font-size:22px;font-weight:700">${u.totalScore}</div>
+        <div style="font-size:11px;color:var(--dim)">⏱ ${fmtTime(u.totalTime)}</div>
+      </div>
+    </div>`;
+  }).join('');
+  return`<div class="screen">
+  <div style="background:linear-gradient(180deg,rgba(115,24,40,.5) 0%,transparent 100%);padding:24px 0 18px;border-bottom:1px solid var(--border)">
+    <div class="ctr">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn btn-ghost" style="padding:8px 12px" onclick="go('dashboard')">← Voltar</button>
+        <div>
+          <h1 class="serif" style="font-size:22px">🏆 Ranking Geral</h1>
+          <p style="font-size:12px;color:var(--dim);margin-top:2px">Maior pontuação · desempate pelo menor tempo</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ctr" style="padding-bottom:40px">
+    ${sorted.length?rows:'<p style="color:var(--dim);text-align:center;padding:40px 0">Nenhum participante ainda.</p>'}
+  </div>
+</div>`;
+}
+
+// ─── RENDER DISPATCH ─────────────────────────────────────────
+function render(){
+  const app=document.getElementById('app');
+  const screens={login:rLogin,dashboard:rDash,quiz:rQuiz,stageEnd:rStageEnd,ranking:rRanking};
+  app.innerHTML=(screens[S.screen]||rLogin)();
+  // Attach login form
+  const lf=document.getElementById('lf');
+  if(lf)lf.addEventListener('submit',e=>{
+    e.preventDefault();
+    const n=document.getElementById('in').value.trim();
+    const p=document.getElementById('ip').value.trim();
+    const r=document.getElementById('ir').value;
+    const err=document.getElementById('lerr');
+    if(!n||!p||!r){err.style.display='block';err.textContent='Por favor, preencha todos os campos.';return;}
+    S.user={
+      id:'u_'+Date.now(),name:n,parish:p,role:r,
+      stageProgress:Array(N_STAGES).fill(null).map(()=>({done:false,score:0,far:0,time:0})),
+      totalScore:0,totalTime:0
+    };
+    go('dashboard');
+  });
+}
+
+// ─── INIT ────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
