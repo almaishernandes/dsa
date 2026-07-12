@@ -1,3 +1,4 @@
+require('dotenv').config();
 /*
   DSA — Desafio dos Servidores do Altar
   ─────────────────────────────────────
@@ -10,28 +11,11 @@
     Senha  : DSAZelusDomus
 */
 
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const fs = require('fs');
-const crypto = require('crypto');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
-const Datastore = require('@seald-io/nedb');
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
-const SECRET = process.env.JWT_SECRET || 'dsa-fallback-' + crypto.randomBytes(8).toString('hex');
-
 // ─── CORS ─────────────────────────────────────────────────────
-// Em produção: FRONTEND_URL=https://seudominio.com.br (Hostinger)
-// Em dev local: permite qualquer origem
+// Em produção: FRONTEND_URL=https://dsa.servidoresdoaltar.site
 const allowedOrigins = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(',').map(o => o.trim())
-  : true; // true = permite todas as origens em dev
+  : true;
 
 app.use(cors({
   origin: allowedOrigins,
@@ -39,11 +23,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: false,
 }));
-app.options('*', cors()); // preflight para todos os endpoints
+app.options('*', cors());
 
 // ─── DATASTORES ───────────────────────────────────────────────
-// DATA_DIR pode apontar para um disco persistente no Render
-// (Render → Settings → Disks → montar em /var/data)
 const DATA_DIR = path.join(__dirname, 'data');
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
@@ -59,6 +41,8 @@ db.users.ensureIndex({ fieldName: 'email', unique: true });
 db.users.ensureIndex({ fieldName: 'resetToken' });
 db.progress.ensureIndex({ fieldName: 'userId' });
 db.questions.ensureIndex({ fieldName: 'trailId' });
+
+app.use(express.json());
 
 // ─── SEED: TEMAS DA TRILHA 1 ─────────────────────────────────
 const TEMA_SEED = [
@@ -88,22 +72,60 @@ const TRILHA_SEED = [
 // ─── E-MAIL ───────────────────────────────────────────────────
 const hasSMTP = !!process.env.SMTP_HOST;
 const mailer = hasSMTP
-  ? nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: +(process.env.SMTP_PORT || 587),
-    secure: process.env.SMTP_SECURE === 'true',
-    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+  ? // CONFIGURAÇÃO DO CORREIO VIA API HTTP DO BREVO (Substitui as linhas 73 a 89)
+const mailer = {
+  sendMail: async (opts) => {
+    try {
+      const url = 'https://api.brevo.com/v3/smtp/email';
+
+      // Monta os dados estruturados exigidos pela API do Brevo
+      const data = {
+        sender: {
+          name: "Servidores do Altar",
+          email: process.env.SMTP_FROM || "dsa.servidoresdoaltar@gmail.com"
+        },
+        to: [{ email: opts.to }],
+        subject: opts.subject || "Recuperação de Senha - DSA",
+        htmlContent: opts.html || opts.text
+      };
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'api-key': process.env.SMTP_PASS, // Irá ler a chave xkeysib configurada no Render
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`[BREVO API ERROR]: ${errorText}`);
+        throw new Error(`Erro no Brevo API: ${errorText}`);
+      }
+
+      const result = await response.json();
+      console.log('=> E-mail enviado com sucesso via API do Brevo!', result);
+      return result;
+
+    } catch (err) {
+      console.error('=> Falha crítica no envio via API:', err.message);
+      throw err;
+    }
+  }
+};
   })
   : {
-    sendMail: async (opts) => {
-      const link = opts.text?.match(/http\S+/)?.[0] || '';
-      console.log('\n╔══════════════════════════════════════════════════════════');
-      console.log('║  📧  RECUPERAÇÃO DE SENHA  (sem SMTP — modo dev)');
-      console.log('║  Para  : ' + opts.to);
-      console.log('║  Link  : ' + link);
-      console.log('╚══════════════════════════════════════════════════════════\n');
-    }
-  };
+  sendMail: async (opts) => {
+    const link = opts.text?.match(/http\S+/)?.[0] || '';
+    console.log('\n╔══════════════════════════════════════════════════════════');
+    console.log('║  📧  RECUPERAÇÃO DE SENHA  (sem SMTP — modo dev)');
+    console.log('║  Para  : ' + opts.to);
+    console.log('║  Link  : ' + link);
+    console.log('╚══════════════════════════════════════════════════════════\n');
+  }
+};
 
 // ─── MIDDLEWARE ───────────────────────────────────────────────
 app.use(express.json({ limit: '1mb' }));
