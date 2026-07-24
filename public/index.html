@@ -1849,14 +1849,10 @@
 
       let trilhaSelector = '';
       if (S.trilhas.length > 1) {
-        let prevComplete = true;
         trilhaSelector = `<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px">`;
         S.trilhas.forEach((t, i) => {
           const isActive = t._id === trilha?._id;
-          const unlocked = i === 0 || prevComplete;
-          prevComplete = isTrilhaComplete(t, S.progress);
-          trilhaSelector += `<button class="trilha-tab ${isActive ? 'active' : ''} ${!unlocked ? 'locked' : ''}"
-        ${unlocked ? `onclick="selectTrilha('${t._id}')"` : 'disabled'} title="${!unlocked ? 'Complete a trilha anterior para desbloquear' : ''}">
+          trilhaSelector += `<button class="trilha-tab ${isActive ? 'active' : ''}" onclick="selectTrilha('${t._id}')">
         ${t.icon || '✝'} ${t.name}</button>`;
         });
         trilhaSelector += '</div>';
@@ -1910,14 +1906,13 @@ ${trilhaSelector}</div>
 
     function tCard(i, tema, trilha) {
       if (!tema) return `<div style="flex:1"></div>`;
-      const p = getProgT(trilha._id, i), done = !!p.completed, prev = i === 0 || !!getProgT(trilha._id, i - 1).completed;
-      const avail = prev && !done, locked = !prev;
-      return `<div class="sc ${done ? 'done' : avail ? 'avail' : 'locked'}" ${!locked ? `onclick="startStage(${i})"` : ''}>
-<div class="sc-ico">${locked ? '🔒' : done ? '✅' : tema.icon || '✝'}</div>
+      const p = getProgT(trilha._id, i), done = !!p.completed;
+      return `<div class="sc ${done ? 'done' : 'avail'}" onclick="startStage(${i})">
+<div class="sc-ico">${done ? '✅' : tema.icon || '✝'}</div>
 <div class="sc-num">Etapa ${i + 1}</div><div class="sc-ttl">${tema.name}</div>
 ${done ? `<div style="margin-top:6px"><span class="badge bo" style="font-size:10px">${p.score}pts</span>
 <span class="badge bw" style="font-size:10px;margin-left:3px">${Math.round(p.first_attempt_rate)}%</span></div>`
-          : avail ? `<div style="margin-top:6px"><span class="badge bw" style="font-size:10px">Disponível</span></div>` : ''}
+          : `<div style="margin-top:6px"><span class="badge bw" style="font-size:10px">Disponível</span></div>`}
 </div>`;
     }
 
