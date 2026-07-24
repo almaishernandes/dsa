@@ -1,4 +1,18 @@
 require('dotenv').config();
+
+const express   = require('express');
+const cors      = require('cors');
+const path      = require('path');
+const fs        = require('fs');
+const crypto    = require('crypto');
+const bcrypt    = require('bcryptjs');
+const jwt       = require('jsonwebtoken');
+const Datastore = require('@seald-io/nedb');
+
+const app      = express();
+const PORT     = process.env.PORT || 3000;
+const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
+const SECRET   = process.env.JWT_SECRET || 'dsa-fallback-' + crypto.randomBytes(8).toString('hex');
 /*
   DSA — Desafio dos Servidores do Altar
   ─────────────────────────────────────
@@ -70,60 +84,33 @@ const TRILHA_SEED = [
 ];
 
 // ─── E-MAIL ───────────────────────────────────────────────────
-const hasSMTP = !!process.env.SMTP_HOST;
-const mailer = hasSMTP
-  ? // CONFIGURAÇÃO DO CORREIO VIA API HTTP DO BREVO (Substitui as linhas 73 a 89)
 const mailer = {
   sendMail: async (opts) => {
-    try {
-      const url = 'https://api.brevo.com/v3/smtp/email';
-
-      // Monta os dados estruturados exigidos pela API do Brevo
-      const data = {
-        sender: {
-          name: "Servidores do Altar",
-          email: process.env.SMTP_FROM || "dsa.servidoresdoaltar@gmail.com"
-        },
-        to: [{ email: opts.to }],
-        subject: opts.subject || "Recuperação de Senha - DSA",
-        htmlContent: opts.html || opts.text
-      };
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'accept': 'application/json',
-          'api-key': process.env.SMTP_PASS, // Irá ler a chave xkeysib configurada no Render
-          'content-type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`[BREVO API ERROR]: ${errorText}`);
-        throw new Error(`Erro no Brevo API: ${errorText}`);
-      }
-
-      const result = await response.json();
-      console.log('=> E-mail enviado com sucesso via API do Brevo!', result);
-      return result;
-
-    } catch (err) {
-      console.error('=> Falha crítica no envio via API:', err.message);
-      throw err;
+    if (!process.env.SMTP_PASS) {
+      const link = opts.text?.match(/http\S+/)?.[0] || '';
+      console.log('\n╔══════════════════════════════════════════════════════════');
+      console.log('║  📧  RECUPERAÇÃO DE SENHA  (sem SMTP_PASS — modo dev)');
+      console.log('║  Para  : ' + opts.to);
+      console.log('║  Link  : ' + link);
+      console.log('╚══════════════════════════════════════════════════════════\n');
+      return;
     }
-  }
-};
-  })
-  : {
-  sendMail: async (opts) => {
-    const link = opts.text?.match(/http\S+/)?.[0] || '';
-    console.log('\n╔══════════════════════════════════════════════════════════');
-    console.log('║  📧  RECUPERAÇÃO DE SENHA  (sem SMTP — modo dev)');
-    console.log('║  Para  : ' + opts.to);
-    console.log('║  Link  : ' + link);
-    console.log('╚══════════════════════════════════════════════════════════\n');
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': process.env.SMTP_PASS,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        sender: { name: 'Servidores do Altar', email: process.env.SMTP_FROM || 'dsa.servidoresdoaltar@gmail.com' },
+        to: [{ email: opts.to }],
+        subject: opts.subject,
+        htmlContent: opts.html || opts.text
+      })
+    });
+    if (!response.ok) throw new Error(`Erro Brevo API: ${await response.text()}`);
+    return response.json();
   }
 };
 
@@ -332,9 +319,9 @@ app.post('/api/auth/reset-password', async (req, res) => {
   } catch (e) { console.error(e); res.status(500).json({ error: 'Erro ao redefinir senha.' }); }
 });
 
-// ─── ROTAS: TRILHAS (público, autenticado) ────────────────────
+// ─── ROTAS: TRILHAS (público) ─────────────────────────────────
 
-app.get('/api/trilhas', authGuard, async (req, res) => {
+app.get('/api/trilhas', async (_, res) => {
   try {
     const trilhas = await db.trilhas.findAsync({});
     trilhas.sort((a, b) => a.code - b.code);
@@ -407,7 +394,7 @@ app.get('/api/ranking', authGuard, async (req, res) => {
 // ─── ROTAS: QUIZ ──────────────────────────────────────────────
 
 // Busca 10 questões aleatórias do pool do tema
-app.get('/api/quiz/:temaId', authGuard, async (req, res) => {
+app.get('/api/quiz/:temaId', async (req, res) => {
   try {
     const { temaId } = req.params;
     const pool = await db.questions.findAsync({ trailId: temaId });
@@ -621,7 +608,7 @@ seedAll().then(() => {
     console.log('\n  ✝  DSA — Desafio dos Servidores do Altar');
     console.log(`     Servidor  : http://localhost:${PORT}`);
     console.log(`     Dados     : ./data/  (5 bancos NeDB)`);
-    console.log(`     E-mail    : ${hasSMTP ? 'SMTP configurado ✓' : 'modo dev — links no console'}`);
+    console.log(`     E-mail    : ${process.env.SMTP_PASS ? 'Brevo API configurado ✓' : 'modo dev — links no console'}`);
     console.log(`     Suporte   : dsa.servidoresdoaltar@gmail.com`);
     console.log('');
   });

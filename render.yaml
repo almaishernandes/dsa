@@ -11,11 +11,9 @@ services:
       - key: JWT_SECRET
         generateValue: true   # Render gera automaticamente um valor seguro
       - key: FRONTEND_URL
-        value: https://seudominio.com.br   # ← alterar para seu domínio na Hostinger
+        value: https://dsa.servidoresdoaltar.site
       - key: BASE_URL
-        value: https://dsa-api.onrender.com  # ← alterar após criar o serviço
-      - key: DATA_DIR
-        value: /var/data
+        value: https://dsa-api.onrender.com
 
 # ── Disco Persistente ─────────────────────────────────────
 # Descomente o bloco abaixo após fazer upgrade para plano pago

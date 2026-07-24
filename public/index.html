@@ -1,597 +1,1671 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DSA — Desafio dos Servidores do Altar</title>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0B0810;--bg2:#0F0C16;--card:#160D1E;--inp:#1E1228;
-  --wine:#731828;--winel:#9B2438;
-  --gold:#C8A84B;--goldl:#E5C96A;
-  --ice:#F0EDE6;--dim:#8A7C6E;--dim2:#5A4E48;
-  --ok:#1E6B40;--okl:#25994F;
-  --err:#8C1515;--errl:#C02020;
-  --bdr:#2D1840;--bdr2:#3D2450;
-  --r:12px;--rsm:8px;--t:.2s ease;
-  --shadow:0 8px 32px rgba(0,0,0,.65);
-}
-html{scroll-behavior:smooth}
-body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ice);min-height:100vh;line-height:1.5;overflow-x:hidden}
-#app{min-height:100vh;display:flex;flex-direction:column}
-.serif{font-family:Georgia,'Times New Roman',serif}
-.gold{color:var(--gold)}.dim{color:var(--dim)}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>DSA — Desafio dos Servidores do Altar</title>
+  <meta name="description" content="Desafio dos Servidores do Altar — Quiz de formação litúrgica e doutrinal.">
+  <meta name="theme-color" content="#731828">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DSA">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon-192.svg">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
 
-.screen{min-height:100vh;display:flex;flex-direction:column;animation:fadeIn .25s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
-.ctr{width:100%;max-width:640px;margin:0 auto;padding:0 16px}
-.ctr-sm{width:100%;max-width:440px;margin:0 auto;padding:0 16px}
-.ctr-lg{width:100%;max-width:1100px;margin:0 auto;padding:0 16px}
+    :root {
+      --bg: #0B0810;
+      --bg2: #0F0C16;
+      --card: #160D1E;
+      --inp: #1E1228;
+      --wine: #731828;
+      --winel: #9B2438;
+      --gold: #C8A84B;
+      --goldl: #E5C96A;
+      --ice: #F0EDE6;
+      --dim: #8A7C6E;
+      --dim2: #5A4E48;
+      --ok: #1E6B40;
+      --okl: #25994F;
+      --err: #8C1515;
+      --errl: #C02020;
+      --bdr: #2D1840;
+      --bdr2: #3D2450;
+      --r: 12px;
+      --rsm: 8px;
+      --t: .2s ease;
+      --shadow: 0 8px 32px rgba(0, 0, 0, .65);
+    }
 
-.card{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);padding:24px;box-shadow:var(--shadow)}
+    html {
+      scroll-behavior: smooth
+    }
 
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 20px;border-radius:var(--rsm);border:none;cursor:pointer;font-size:14px;font-weight:600;transition:var(--t);font-family:inherit;line-height:1;white-space:nowrap}
-.btn:active:not(:disabled){transform:scale(.97)}
-.btn:disabled{opacity:.45;cursor:not-allowed}
-.btn-gold{background:var(--gold);color:#1A0A00}.btn-gold:hover:not(:disabled){background:var(--goldl)}
-.btn-wine{background:var(--wine);color:var(--ice)}.btn-wine:hover:not(:disabled){background:var(--winel)}
-.btn-ok{background:var(--ok);color:#fff}.btn-ok:hover:not(:disabled){background:var(--okl)}
-.btn-ghost{background:transparent;color:var(--dim);border:1px solid var(--bdr2)}.btn-ghost:hover:not(:disabled){color:var(--ice);border-color:var(--dim2)}
-.btn-danger{background:transparent;color:#F87171;border:1px solid var(--err)}.btn-danger:hover:not(:disabled){background:var(--err);color:var(--ice)}
-.btn-link{background:none;border:none;color:var(--gold);font-size:14px;cursor:pointer;padding:0;font-family:inherit;text-decoration:underline;text-underline-offset:3px}.btn-link:hover{color:var(--goldl)}
-.btn-icon{padding:7px 10px;font-size:15px}
-.btn-full{width:100%}
-.btn-sm{padding:7px 14px;font-size:13px}
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--ice);
+      min-height: 100vh;
+      line-height: 1.5;
+      overflow-x: hidden
+    }
 
-.fg{margin-bottom:14px}
-.fl{display:block;margin-bottom:5px;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
-.fi{width:100%;padding:11px 14px;background:var(--inp);border:1.5px solid var(--bdr);border-radius:var(--rsm);color:var(--ice);font-size:14px;outline:none;transition:var(--t);font-family:inherit}
-.fi:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,168,75,.15)}
-textarea.fi{min-height:90px;resize:vertical;line-height:1.55}
-select.fi option{background:var(--card)}
-.pw-wrap{position:relative}
-.pw-wrap .fi{padding-right:42px}
-.pw-eye{position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--dim);font-size:17px;line-height:1;padding:2px}.pw-eye:hover{color:var(--ice)}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-.form-err{font-size:13px;color:#FCA5A5;margin-bottom:12px;padding:10px 14px;background:rgba(140,21,21,.2);border:1px solid var(--err);border-radius:var(--rsm)}
-.form-ok{font-size:13px;color:#86EFAC;margin-bottom:12px;padding:10px 14px;background:rgba(30,107,64,.2);border:1px solid var(--okl);border-radius:var(--rsm)}
-.optional{font-size:10px;color:var(--dim2);font-weight:normal;text-transform:none;letter-spacing:0;margin-left:5px}
-.req{color:var(--gold)}
+    #app {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column
+    }
 
-.pt{height:5px;background:var(--bdr);border-radius:3px;overflow:hidden}
-.pf{height:100%;background:linear-gradient(90deg,var(--wine),var(--gold));border-radius:3px;transition:width .4s ease}
+    .serif {
+      font-family: Georgia, 'Times New Roman', serif
+    }
 
-.badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:600}
-.bw{background:rgba(115,24,40,.3);color:var(--gold);border:1px solid var(--wine)}
-.bg{background:rgba(200,168,75,.15);color:var(--gold);border:1px solid var(--gold)}
-.bo{background:rgba(30,107,64,.3);color:#4ADE80;border:1px solid var(--okl)}
-.be{background:rgba(140,21,21,.3);color:#F87171;border:1px solid var(--err)}
-.b-blue{background:rgba(30,80,140,.3);color:#93C5FD;border:1px solid #1D4ED8}
+    .gold {
+      color: var(--gold)
+    }
 
-.dv{height:1px;background:var(--bdr);margin:18px 0}
-.dv-text{display:flex;align-items:center;gap:12px;color:var(--dim2);font-size:13px;margin:16px 0}
-.dv-text::before,.dv-text::after{content:'';flex:1;height:1px;background:var(--bdr)}
+    .dim {
+      color: var(--dim)
+    }
 
-.ans{width:100%;padding:13px 16px;background:var(--inp);border:2px solid var(--bdr);border-radius:var(--rsm);color:var(--ice);font-size:14px;text-align:left;cursor:pointer;transition:var(--t);margin-bottom:9px;display:flex;align-items:flex-start;gap:11px;font-family:inherit;line-height:1.5}
-.ans:hover:not(:disabled){border-color:var(--gold);background:rgba(200,168,75,.07)}
-.ans:disabled{cursor:default}
-.ans .ltr{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;border-radius:50%;background:var(--bdr2);font-size:12px;font-weight:700;color:var(--dim);flex-shrink:0;transition:var(--t)}
-.ans.correct{border-color:var(--okl);background:rgba(30,107,64,.2);animation:pulse-ok .35s ease}
-.ans.correct .ltr{background:var(--okl);color:#fff}
-.ans.wrong{border-color:var(--errl);background:rgba(140,21,21,.2);animation:shake .3s ease}
-.ans.wrong .ltr{background:var(--err);color:#fff}
-.ans.dimmed{opacity:.3}
-@keyframes pulse-ok{0%{transform:scale(1)}50%{transform:scale(1.015)}100%{transform:scale(1)}}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-.fb{padding:13px 15px;border-radius:var(--rsm);font-size:13px;margin-top:11px;line-height:1.65}
-.fb.err{background:rgba(140,21,21,.2);border:1px solid var(--err);color:#FCA5A5}
-.fb.ok{background:rgba(30,107,64,.2);border:1px solid var(--okl);color:#86EFAC}
+    .screen {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn .25s ease
+    }
 
-.qhdr{background:var(--card);border-bottom:1px solid var(--bdr);padding:11px 0;position:sticky;top:0;z-index:10}
-.qmeta{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;font-size:13px}
-.qtimer{font-family:'Courier New',monospace;font-size:16px;color:var(--gold);font-weight:700}
-.qscore{font-size:16px;font-weight:700;color:var(--gold)}
-.qval{display:inline-block;padding:3px 11px;background:rgba(200,168,75,.13);border:1px solid var(--gold);border-radius:99px;color:var(--gold);font-size:12px;font-weight:700}
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(5px)
+      }
 
-.sg{display:flex;flex-direction:column;gap:9px;padding:16px 0 30px}
-.sr{display:flex;gap:9px}
-.sr.rev{flex-direction:row-reverse}
-.sc{flex:1;background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);padding:13px;cursor:pointer;transition:var(--t);position:relative;overflow:hidden;min-width:0}
-.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:transparent}
-.sc:hover:not(.locked){transform:translateY(-2px);border-color:var(--gold)}
-.sc.locked{opacity:.4;cursor:not-allowed}
-.sc.done{border-color:var(--okl)}.sc.done::before{background:var(--okl)}
-.sc.avail{border-color:var(--wine)}.sc.avail::before{background:linear-gradient(90deg,var(--wine),var(--gold))}
-.sc-num{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
-.sc-ttl{font-family:Georgia,serif;font-size:12px;color:var(--ice);font-weight:600;line-height:1.3}
-.sc-ico{font-size:17px;margin-bottom:5px}
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
 
-.dhdr{background:linear-gradient(180deg,rgba(115,24,40,.55) 0%,transparent 100%);padding:26px 0 18px;border-bottom:1px solid var(--bdr)}
+    .ctr {
+      width: 100%;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 0 16px
+    }
 
-.stg{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin:16px 0}
-.stb{background:var(--inp);border:1px solid var(--bdr);border-radius:var(--rsm);padding:14px;text-align:center}
-.stv{font-size:26px;font-weight:700;font-family:Georgia,serif;color:var(--gold)}
-.stl{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
+    .ctr-sm {
+      width: 100%;
+      max-width: 440px;
+      margin: 0 auto;
+      padding: 0 16px
+    }
 
-.rkr{display:flex;align-items:center;gap:11px;padding:13px 0;border-bottom:1px solid var(--bdr)}
-.rkp{font-size:15px;font-weight:700;font-family:Georgia,serif;min-width:34px;text-align:center}
+    .ctr-lg {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 16px
+    }
 
-.skip-bar{position:fixed;bottom:0;left:0;right:0;padding:8px 16px 14px;background:linear-gradient(0deg,var(--bg) 70%,transparent);display:flex;justify-content:center;z-index:9}
+    .card {
+      background: var(--card);
+      border: 1px solid var(--bdr);
+      border-radius: var(--r);
+      padding: 24px;
+      box-shadow: var(--shadow)
+    }
 
-.logo-wrap{text-align:center;padding:32px 0 24px}
-.logo-cross{font-size:46px;color:var(--gold);text-shadow:0 0 26px rgba(200,168,75,.45);display:block;margin-bottom:9px}
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 10px 20px;
+      border-radius: var(--rsm);
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: var(--t);
+      font-family: inherit;
+      line-height: 1;
+      white-space: nowrap
+    }
 
-/* ─── ADMIN ─────────────────────────────────────────────────── */
-.admin-layout{min-height:100vh;display:flex;flex-direction:column}
-.admin-nav{background:var(--card);border-bottom:1px solid var(--bdr);padding:0 16px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;position:sticky;top:0;z-index:20}
-.admin-nav-logo{font-family:Georgia,serif;color:var(--gold);font-size:18px;padding:14px 8px 14px 0;margin-right:8px;border-right:1px solid var(--bdr);white-space:nowrap}
-.nav-tab{padding:14px 14px;font-size:13px;font-weight:600;color:var(--dim);cursor:pointer;border:none;background:none;font-family:inherit;border-bottom:2px solid transparent;transition:var(--t);white-space:nowrap}
-.nav-tab:hover{color:var(--ice)}
-.nav-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
-.nav-spacer{flex:1}
-.admin-body{flex:1;padding:20px 16px 40px}
+    .btn:active:not(:disabled) {
+      transform: scale(.97)
+    }
 
-.tbl-wrap{overflow-x:auto;margin-top:16px;border-radius:var(--rsm);border:1px solid var(--bdr)}
-table{width:100%;border-collapse:collapse;font-size:13px}
-thead{background:rgba(45,24,64,.5)}
-th{padding:10px 14px;text-align:left;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;font-weight:600;white-space:nowrap}
-td{padding:11px 14px;border-top:1px solid var(--bdr);vertical-align:top;line-height:1.5}
-tr:hover td{background:rgba(45,24,64,.25)}
-.td-q{max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.td-actions{display:flex;gap:6px;white-space:nowrap}
+    .btn:disabled {
+      opacity: .45;
+      cursor: not-allowed
+    }
 
-/* Trilha card (admin) */
-.trilha-card{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);padding:18px;margin-bottom:16px}
-.tema-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border:1px solid var(--bdr2);border-radius:99px;font-size:12px;margin:3px;cursor:default}
+    .btn-gold {
+      background: var(--gold);
+      color: #1A0A00
+    }
 
-/* MODAL */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;overflow-y:auto;padding:20px;align-items:flex-start;justify-content:center}
-.modal-bg.open{display:flex}
-.modal-box{background:var(--card);border:1px solid var(--bdr2);border-radius:var(--r);padding:24px;width:100%;max-width:700px;box-shadow:var(--shadow);animation:fadeIn .2s ease}
+    .btn-gold:hover:not(:disabled) {
+      background: var(--goldl)
+    }
 
-/* Trilha switcher */
-.trilha-tab{padding:7px 16px;border-radius:99px;border:1.5px solid var(--bdr2);cursor:pointer;font-size:12px;font-weight:600;color:var(--dim);background:transparent;font-family:inherit;transition:var(--t)}
-.trilha-tab:hover{border-color:var(--gold);color:var(--ice)}
-.trilha-tab.active{border-color:var(--gold);background:rgba(200,168,75,.12);color:var(--gold)}
-.trilha-tab.locked{opacity:.4;cursor:not-allowed}
+    .btn-wine {
+      background: var(--wine);
+      color: var(--ice)
+    }
 
-/* SPINNER */
-@keyframes spin{to{transform:rotate(360deg)}}
-.spinner{border-radius:50%;border-style:solid;border-color:rgba(200,168,75,.25);border-top-color:var(--gold);animation:spin .7s linear infinite}
+    .btn-wine:hover:not(:disabled) {
+      background: var(--winel)
+    }
 
-/* TOAST */
-.toast{pointer-events:auto;padding:11px 18px;border-radius:var(--rsm);font-size:13px;max-width:90vw;text-align:center;opacity:0;transform:translateY(10px);transition:.25s ease;box-shadow:var(--shadow)}
-.toast.show{opacity:1;transform:translateY(0)}
-.toast.tok{background:rgba(30,107,64,.92);border:1px solid var(--okl);color:#86EFAC}
-.toast.terr{background:rgba(140,21,21,.92);border:1px solid var(--err);color:#FCA5A5}
-.toast.tinfo{background:rgba(115,24,40,.92);border:1px solid var(--wine);color:var(--gold)}
+    .btn-ok {
+      background: var(--ok);
+      color: #fff
+    }
 
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:3px}
+    .btn-ok:hover:not(:disabled) {
+      background: var(--okl)
+    }
 
-/* Tema rows dinâmicos no modal trilha */
-.tema-row{display:grid;grid-template-columns:40px 1fr 1fr;gap:8px;margin-bottom:8px;align-items:center}
+    .btn-ghost {
+      background: transparent;
+      color: var(--dim);
+      border: 1px solid var(--bdr2)
+    }
 
-@media(max-width:600px){
-  .row2,.row3{grid-template-columns:1fr}
-  .stg{grid-template-columns:1fr}
-  .card,.admin-body{padding:14px}
-  .td-q{max-width:180px}
-  .tema-row{grid-template-columns:36px 1fr}
-}
+    .btn-ghost:hover:not(:disabled) {
+      color: var(--ice);
+      border-color: var(--dim2)
+    }
 
-/* ─── MATERIAL DE ESTUDO ─────────────────────────────────── */
-.ms-wrap{font-family:Georgia,'Times New Roman',serif;color:var(--ice);max-width:860px;margin:0 auto;padding:28px 0 60px}
-.ms-cover{text-align:center;padding:32px 0 28px;border-bottom:2px solid var(--gold);margin-bottom:32px}
-.ms-cover h1{font-size:28px;color:var(--gold);letter-spacing:.04em;margin-bottom:6px}
-.ms-cover p{font-size:13px;color:var(--dim);font-family:sans-serif}
-.ms-tema{margin-bottom:44px}
-.ms-tema-hdr{display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(115,24,40,.25);border-left:4px solid var(--gold);border-radius:0 var(--rsm) var(--rsm) 0;margin-bottom:18px}
-.ms-tema-hdr .ico{font-size:26px}
-.ms-tema-hdr h2{font-size:19px;color:var(--gold)}
-.ms-tema-hdr .num{font-size:11px;color:var(--dim);font-family:sans-serif;text-transform:uppercase;letter-spacing:.08em}
-.ms-sec{margin-bottom:20px}
-.ms-sec h3{font-size:15px;color:var(--goldl);border-bottom:1px solid var(--bdr);padding-bottom:5px;margin-bottom:10px;font-family:sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
-.ms-sec p{font-size:14px;line-height:1.8;margin-bottom:10px;text-align:justify}
-.ms-sec ul,.ms-sec ol{padding-left:20px;margin-bottom:10px}
-.ms-sec li{font-size:14px;line-height:1.75;margin-bottom:4px}
-.ms-sec li strong{color:var(--goldl)}
-.ms-sec .ref{font-size:12px;color:var(--dim);font-family:sans-serif;font-style:italic;margin-top:6px}
-.ms-box{background:rgba(200,168,75,.07);border:1px solid rgba(200,168,75,.2);border-radius:var(--rsm);padding:12px 16px;margin:12px 0}
-.ms-box p{margin-bottom:0}
-.ms-dv{height:1px;background:var(--bdr);margin:28px 0}
-.ms-print-btn{position:fixed;bottom:20px;right:20px;z-index:100}
+    .btn-danger {
+      background: transparent;
+      color: #F87171;
+      border: 1px solid var(--err)
+    }
 
-@media print{
-  body{background:#fff!important;color:#111!important}
-  #app>*:not(.ms-print-wrap){display:none!important}
-  .ms-print-wrap{display:block!important}
-  .admin-nav,.ms-print-btn,.admin-body>*:not(.ms-print-wrap){display:none!important}
-  .ms-wrap{color:#111;max-width:100%;padding:0}
-  .ms-cover h1{color:#5B1A24}
-  .ms-tema-hdr{background:#f5e8cc;border-left-color:#5B1A24}
-  .ms-tema-hdr h2{color:#5B1A24}
-  .ms-tema-hdr .num{color:#777}
-  .ms-sec h3{color:#5B1A24}
-  .ms-sec li strong{color:#5B1A24}
-  .ms-box{background:#fdf8ec;border-color:#c8a84b}
-  .ms-sec .ref{color:#777}
-  .ms-tema{page-break-inside:avoid}
-  .ms-cover{border-bottom-color:#5B1A24}
-}
-</style>
+    .btn-danger:hover:not(:disabled) {
+      background: var(--err);
+      color: var(--ice)
+    }
+
+    .btn-link {
+      background: none;
+      border: none;
+      color: var(--gold);
+      font-size: 14px;
+      cursor: pointer;
+      padding: 0;
+      font-family: inherit;
+      text-decoration: underline;
+      text-underline-offset: 3px
+    }
+
+    .btn-link:hover {
+      color: var(--goldl)
+    }
+
+    .btn-icon {
+      padding: 7px 10px;
+      font-size: 15px
+    }
+
+    .btn-full {
+      width: 100%
+    }
+
+    .btn-sm {
+      padding: 7px 14px;
+      font-size: 13px
+    }
+
+    .fg {
+      margin-bottom: 14px
+    }
+
+    .fl {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 11px;
+      color: var(--dim);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-weight: 600
+    }
+
+    .fi {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--inp);
+      border: 1.5px solid var(--bdr);
+      border-radius: var(--rsm);
+      color: var(--ice);
+      font-size: 14px;
+      outline: none;
+      transition: var(--t);
+      font-family: inherit
+    }
+
+    .fi:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(200, 168, 75, .15)
+    }
+
+    textarea.fi {
+      min-height: 90px;
+      resize: vertical;
+      line-height: 1.55
+    }
+
+    select.fi option {
+      background: var(--card)
+    }
+
+    .pw-wrap {
+      position: relative
+    }
+
+    .pw-wrap .fi {
+      padding-right: 42px
+    }
+
+    .pw-eye {
+      position: absolute;
+      right: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--dim);
+      font-size: 17px;
+      line-height: 1;
+      padding: 2px
+    }
+
+    .pw-eye:hover {
+      color: var(--ice)
+    }
+
+    .row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px
+    }
+
+    .row3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px
+    }
+
+    .form-err {
+      font-size: 13px;
+      color: #FCA5A5;
+      margin-bottom: 12px;
+      padding: 10px 14px;
+      background: rgba(140, 21, 21, .2);
+      border: 1px solid var(--err);
+      border-radius: var(--rsm)
+    }
+
+    .form-ok {
+      font-size: 13px;
+      color: #86EFAC;
+      margin-bottom: 12px;
+      padding: 10px 14px;
+      background: rgba(30, 107, 64, .2);
+      border: 1px solid var(--okl);
+      border-radius: var(--rsm)
+    }
+
+    .optional {
+      font-size: 10px;
+      color: var(--dim2);
+      font-weight: normal;
+      text-transform: none;
+      letter-spacing: 0;
+      margin-left: 5px
+    }
+
+    .req {
+      color: var(--gold)
+    }
+
+    .pt {
+      height: 5px;
+      background: var(--bdr);
+      border-radius: 3px;
+      overflow: hidden
+    }
+
+    .pf {
+      height: 100%;
+      background: linear-gradient(90deg, var(--wine), var(--gold));
+      border-radius: 3px;
+      transition: width .4s ease
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 600
+    }
+
+    .bw {
+      background: rgba(115, 24, 40, .3);
+      color: var(--gold);
+      border: 1px solid var(--wine)
+    }
+
+    .bg {
+      background: rgba(200, 168, 75, .15);
+      color: var(--gold);
+      border: 1px solid var(--gold)
+    }
+
+    .bo {
+      background: rgba(30, 107, 64, .3);
+      color: #4ADE80;
+      border: 1px solid var(--okl)
+    }
+
+    .be {
+      background: rgba(140, 21, 21, .3);
+      color: #F87171;
+      border: 1px solid var(--err)
+    }
+
+    .b-blue {
+      background: rgba(30, 80, 140, .3);
+      color: #93C5FD;
+      border: 1px solid #1D4ED8
+    }
+
+    .dv {
+      height: 1px;
+      background: var(--bdr);
+      margin: 18px 0
+    }
+
+    .dv-text {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--dim2);
+      font-size: 13px;
+      margin: 16px 0
+    }
+
+    .dv-text::before,
+    .dv-text::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--bdr)
+    }
+
+    .ans {
+      width: 100%;
+      padding: 13px 16px;
+      background: var(--inp);
+      border: 2px solid var(--bdr);
+      border-radius: var(--rsm);
+      color: var(--ice);
+      font-size: 14px;
+      text-align: left;
+      cursor: pointer;
+      transition: var(--t);
+      margin-bottom: 9px;
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+      font-family: inherit;
+      line-height: 1.5
+    }
+
+    .ans:hover:not(:disabled) {
+      border-color: var(--gold);
+      background: rgba(200, 168, 75, .07)
+    }
+
+    .ans:disabled {
+      cursor: default
+    }
+
+    .ans .ltr {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--bdr2);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--dim);
+      flex-shrink: 0;
+      transition: var(--t)
+    }
+
+    .ans.correct {
+      border-color: var(--okl);
+      background: rgba(30, 107, 64, .2);
+      animation: pulse-ok .35s ease
+    }
+
+    .ans.correct .ltr {
+      background: var(--okl);
+      color: #fff
+    }
+
+    .ans.wrong {
+      border-color: var(--errl);
+      background: rgba(140, 21, 21, .2);
+      animation: shake .3s ease
+    }
+
+    .ans.wrong .ltr {
+      background: var(--err);
+      color: #fff
+    }
+
+    .ans.dimmed {
+      opacity: .3
+    }
+
+    @keyframes pulse-ok {
+      0% {
+        transform: scale(1)
+      }
+
+      50% {
+        transform: scale(1.015)
+      }
+
+      100% {
+        transform: scale(1)
+      }
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0)
+      }
+
+      25% {
+        transform: translateX(-6px)
+      }
+
+      75% {
+        transform: translateX(6px)
+      }
+    }
+
+    .fb {
+      padding: 13px 15px;
+      border-radius: var(--rsm);
+      font-size: 13px;
+      margin-top: 11px;
+      line-height: 1.65
+    }
+
+    .fb.err {
+      background: rgba(140, 21, 21, .2);
+      border: 1px solid var(--err);
+      color: #FCA5A5
+    }
+
+    .fb.ok {
+      background: rgba(30, 107, 64, .2);
+      border: 1px solid var(--okl);
+      color: #86EFAC
+    }
+
+    .qhdr {
+      background: var(--card);
+      border-bottom: 1px solid var(--bdr);
+      padding: 11px 0;
+      position: sticky;
+      top: 0;
+      z-index: 10
+    }
+
+    .qmeta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 7px;
+      font-size: 13px
+    }
+
+    .qtimer {
+      font-family: 'Courier New', monospace;
+      font-size: 16px;
+      color: var(--gold);
+      font-weight: 700
+    }
+
+    .qscore {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--gold)
+    }
+
+    .qval {
+      display: inline-block;
+      padding: 3px 11px;
+      background: rgba(200, 168, 75, .13);
+      border: 1px solid var(--gold);
+      border-radius: 99px;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 700
+    }
+
+    .sg {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      padding: 16px 0 30px
+    }
+
+    .sr {
+      display: flex;
+      gap: 9px
+    }
+
+    .sr.rev {
+      flex-direction: row-reverse
+    }
+
+    .sc {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--bdr);
+      border-radius: var(--r);
+      padding: 13px;
+      cursor: pointer;
+      transition: var(--t);
+      position: relative;
+      overflow: hidden;
+      min-width: 0
+    }
+
+    .sc::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: transparent
+    }
+
+    .sc:hover:not(.locked) {
+      transform: translateY(-2px);
+      border-color: var(--gold)
+    }
+
+    .sc.locked {
+      opacity: .4;
+      cursor: not-allowed
+    }
+
+    .sc.done {
+      border-color: var(--okl)
+    }
+
+    .sc.done::before {
+      background: var(--okl)
+    }
+
+    .sc.avail {
+      border-color: var(--wine)
+    }
+
+    .sc.avail::before {
+      background: linear-gradient(90deg, var(--wine), var(--gold))
+    }
+
+    .sc-num {
+      font-size: 10px;
+      color: var(--dim);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 3px
+    }
+
+    .sc-ttl {
+      font-family: Georgia, serif;
+      font-size: 12px;
+      color: var(--ice);
+      font-weight: 600;
+      line-height: 1.3
+    }
+
+    .sc-ico {
+      font-size: 17px;
+      margin-bottom: 5px
+    }
+
+    .dhdr {
+      background: linear-gradient(180deg, rgba(115, 24, 40, .55) 0%, transparent 100%);
+      padding: 26px 0 18px;
+      border-bottom: 1px solid var(--bdr)
+    }
+
+    .stg {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 11px;
+      margin: 16px 0
+    }
+
+    .stb {
+      background: var(--inp);
+      border: 1px solid var(--bdr);
+      border-radius: var(--rsm);
+      padding: 14px;
+      text-align: center
+    }
+
+    .stv {
+      font-size: 26px;
+      font-weight: 700;
+      font-family: Georgia, serif;
+      color: var(--gold)
+    }
+
+    .stl {
+      font-size: 10px;
+      color: var(--dim);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-top: 3px
+    }
+
+    .rkr {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--bdr)
+    }
+
+    .rkp {
+      font-size: 15px;
+      font-weight: 700;
+      font-family: Georgia, serif;
+      min-width: 34px;
+      text-align: center
+    }
+
+    .skip-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 8px 16px 14px;
+      background: linear-gradient(0deg, var(--bg) 70%, transparent);
+      display: flex;
+      justify-content: center;
+      z-index: 9
+    }
+
+    .logo-wrap {
+      text-align: center;
+      padding: 32px 0 24px
+    }
+
+    .logo-cross {
+      font-size: 46px;
+      color: var(--gold);
+      text-shadow: 0 0 26px rgba(200, 168, 75, .45);
+      display: block;
+      margin-bottom: 9px
+    }
+
+    /* ─── ADMIN ─────────────────────────────────────────────────── */
+    .admin-layout {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column
+    }
+
+    .admin-nav {
+      background: var(--card);
+      border-bottom: 1px solid var(--bdr);
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 20
+    }
+
+    .admin-nav-logo {
+      font-family: Georgia, serif;
+      color: var(--gold);
+      font-size: 18px;
+      padding: 14px 8px 14px 0;
+      margin-right: 8px;
+      border-right: 1px solid var(--bdr);
+      white-space: nowrap
+    }
+
+    .nav-tab {
+      padding: 14px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--dim);
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-family: inherit;
+      border-bottom: 2px solid transparent;
+      transition: var(--t);
+      white-space: nowrap
+    }
+
+    .nav-tab:hover {
+      color: var(--ice)
+    }
+
+    .nav-tab.active {
+      color: var(--gold);
+      border-bottom-color: var(--gold)
+    }
+
+    .nav-spacer {
+      flex: 1
+    }
+
+    .admin-body {
+      flex: 1;
+      padding: 20px 16px 40px
+    }
+
+    .tbl-wrap {
+      overflow-x: auto;
+      margin-top: 16px;
+      border-radius: var(--rsm);
+      border: 1px solid var(--bdr)
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px
+    }
+
+    thead {
+      background: rgba(45, 24, 64, .5)
+    }
+
+    th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 11px;
+      color: var(--dim);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-weight: 600;
+      white-space: nowrap
+    }
+
+    td {
+      padding: 11px 14px;
+      border-top: 1px solid var(--bdr);
+      vertical-align: top;
+      line-height: 1.5
+    }
+
+    tr:hover td {
+      background: rgba(45, 24, 64, .25)
+    }
+
+    .td-q {
+      max-width: 360px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .td-actions {
+      display: flex;
+      gap: 6px;
+      white-space: nowrap
+    }
+
+    /* Trilha card (admin) */
+    .trilha-card {
+      background: var(--card);
+      border: 1px solid var(--bdr);
+      border-radius: var(--r);
+      padding: 18px;
+      margin-bottom: 16px
+    }
+
+    .tema-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border: 1px solid var(--bdr2);
+      border-radius: 99px;
+      font-size: 12px;
+      margin: 3px;
+      cursor: default
+    }
+
+    /* MODAL */
+    .modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .75);
+      z-index: 1000;
+      overflow-y: auto;
+      padding: 20px;
+      align-items: flex-start;
+      justify-content: center
+    }
+
+    .modal-bg.open {
+      display: flex
+    }
+
+    .modal-box {
+      background: var(--card);
+      border: 1px solid var(--bdr2);
+      border-radius: var(--r);
+      padding: 24px;
+      width: 100%;
+      max-width: 700px;
+      box-shadow: var(--shadow);
+      animation: fadeIn .2s ease
+    }
+
+    /* Trilha switcher */
+    .trilha-tab {
+      padding: 7px 16px;
+      border-radius: 99px;
+      border: 1.5px solid var(--bdr2);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--dim);
+      background: transparent;
+      font-family: inherit;
+      transition: var(--t)
+    }
+
+    .trilha-tab:hover {
+      border-color: var(--gold);
+      color: var(--ice)
+    }
+
+    .trilha-tab.active {
+      border-color: var(--gold);
+      background: rgba(200, 168, 75, .12);
+      color: var(--gold)
+    }
+
+    .trilha-tab.locked {
+      opacity: .4;
+      cursor: not-allowed
+    }
+
+    /* SPINNER */
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .spinner {
+      border-radius: 50%;
+      border-style: solid;
+      border-color: rgba(200, 168, 75, .25);
+      border-top-color: var(--gold);
+      animation: spin .7s linear infinite
+    }
+
+    /* TOAST */
+    .toast {
+      pointer-events: auto;
+      padding: 11px 18px;
+      border-radius: var(--rsm);
+      font-size: 13px;
+      max-width: 90vw;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: .25s ease;
+      box-shadow: var(--shadow)
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0)
+    }
+
+    .toast.tok {
+      background: rgba(30, 107, 64, .92);
+      border: 1px solid var(--okl);
+      color: #86EFAC
+    }
+
+    .toast.terr {
+      background: rgba(140, 21, 21, .92);
+      border: 1px solid var(--err);
+      color: #FCA5A5
+    }
+
+    .toast.tinfo {
+      background: rgba(115, 24, 40, .92);
+      border: 1px solid var(--wine);
+      color: var(--gold)
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg)
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--bdr2);
+      border-radius: 3px
+    }
+
+    /* Tema rows dinâmicos no modal trilha */
+    .tema-row {
+      display: grid;
+      grid-template-columns: 40px 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+      align-items: center
+    }
+
+    /* ── ÁREA SEGURA (iPhone notch / home bar) ────────────────── */
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .skip-bar {
+      padding-bottom: calc(14px + env(safe-area-inset-bottom));
+    }
+
+    .qhdr {
+      padding-top: calc(11px + env(safe-area-inset-top));
+    }
+
+    .admin-nav {
+      padding-top: env(safe-area-inset-top);
+    }
+
+    /* ── MOBILE ≤ 600px ────────────────────────────────────────── */
+    @media(max-width:600px) {
+
+      /* layout geral */
+      .row2, .row3 { grid-template-columns: 1fr }
+      .card, .admin-body { padding: 14px }
+      .ctr, .ctr-sm { padding: 0 12px }
+
+      /* estatísticas */
+      .stg { grid-template-columns: 1fr 1fr }
+
+      /* cards de etapa — 2 colunas compactas */
+      .sc { padding: 10px }
+      .sc-ttl { font-size: 11px }
+      .sc-ico { font-size: 14px; margin-bottom: 3px }
+
+      /* quiz */
+      .ans { font-size: 13px; padding: 11px 12px }
+      .ans .ltr { min-width: 22px; height: 22px; font-size: 11px }
+      .qhdr .ctr { padding: 0 12px }
+
+      /* navbar admin — scroll horizontal */
+      .admin-nav { overflow-x: auto; flex-wrap: nowrap; gap: 0 }
+      .admin-nav-logo { font-size: 15px; padding: 12px 6px 12px 0; margin-right: 4px }
+      .nav-tab { padding: 12px 10px; font-size: 12px; white-space: nowrap }
+
+      /* tabelas admin — scroll */
+      .tbl-wrap { font-size: 12px }
+      td, th { padding: 8px 10px }
+      .td-q { max-width: 160px }
+
+      /* modais */
+      .modal-bg { padding: 10px }
+      .modal-box { padding: 18px; max-width: 100% !important }
+
+      /* trilha card */
+      .trilha-card { padding: 14px }
+
+      /* tema-row */
+      .tema-row { grid-template-columns: 36px 1fr }
+
+      /* ranking */
+      .rkr { gap: 8px }
+      .rkp { min-width: 28px; font-size: 13px }
+
+      /* resultado */
+      .stv { font-size: 20px }
+    }
+
+    /* ── MOBILE ≤ 400px (telas pequenas) ─────────────────────── */
+    @media(max-width:400px) {
+      .btn { padding: 9px 14px; font-size: 13px }
+      .btn-gold[style*="font-size:15px"] { font-size: 14px !important }
+      .serif[style*="font-size:28px"] { font-size: 22px !important }
+      .qval { font-size: 11px }
+    }
+
+    /* ─── MATERIAL DE ESTUDO ─────────────────────────────────── */
+    .ms-wrap {
+      font-family: Georgia, 'Times New Roman', serif;
+      color: var(--ice);
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 28px 0 60px
+    }
+
+    .ms-cover {
+      text-align: center;
+      padding: 32px 0 28px;
+      border-bottom: 2px solid var(--gold);
+      margin-bottom: 32px
+    }
+
+    .ms-cover h1 {
+      font-size: 28px;
+      color: var(--gold);
+      letter-spacing: .04em;
+      margin-bottom: 6px
+    }
+
+    .ms-cover p {
+      font-size: 13px;
+      color: var(--dim);
+      font-family: sans-serif
+    }
+
+    .ms-tema {
+      margin-bottom: 44px
+    }
+
+    .ms-tema-hdr {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      background: rgba(115, 24, 40, .25);
+      border-left: 4px solid var(--gold);
+      border-radius: 0 var(--rsm) var(--rsm) 0;
+      margin-bottom: 18px
+    }
+
+    .ms-tema-hdr .ico {
+      font-size: 26px
+    }
+
+    .ms-tema-hdr h2 {
+      font-size: 19px;
+      color: var(--gold)
+    }
+
+    .ms-tema-hdr .num {
+      font-size: 11px;
+      color: var(--dim);
+      font-family: sans-serif;
+      text-transform: uppercase;
+      letter-spacing: .08em
+    }
+
+    .ms-sec {
+      margin-bottom: 20px
+    }
+
+    .ms-sec h3 {
+      font-size: 15px;
+      color: var(--goldl);
+      border-bottom: 1px solid var(--bdr);
+      padding-bottom: 5px;
+      margin-bottom: 10px;
+      font-family: sans-serif;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em
+    }
+
+    .ms-sec p {
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 10px;
+      text-align: justify
+    }
+
+    .ms-sec ul,
+    .ms-sec ol {
+      padding-left: 20px;
+      margin-bottom: 10px
+    }
+
+    .ms-sec li {
+      font-size: 14px;
+      line-height: 1.75;
+      margin-bottom: 4px
+    }
+
+    .ms-sec li strong {
+      color: var(--goldl)
+    }
+
+    .ms-sec .ref {
+      font-size: 12px;
+      color: var(--dim);
+      font-family: sans-serif;
+      font-style: italic;
+      margin-top: 6px
+    }
+
+    .ms-box {
+      background: rgba(200, 168, 75, .07);
+      border: 1px solid rgba(200, 168, 75, .2);
+      border-radius: var(--rsm);
+      padding: 12px 16px;
+      margin: 12px 0
+    }
+
+    .ms-box p {
+      margin-bottom: 0
+    }
+
+    .ms-dv {
+      height: 1px;
+      background: var(--bdr);
+      margin: 28px 0
+    }
+
+    .ms-print-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 100
+    }
+
+    @media print {
+      body {
+        background: #fff !important;
+        color: #111 !important
+      }
+
+      #app>*:not(.ms-print-wrap) {
+        display: none !important
+      }
+
+      .ms-print-wrap {
+        display: block !important
+      }
+
+      .admin-nav,
+      .ms-print-btn,
+      .admin-body>*:not(.ms-print-wrap) {
+        display: none !important
+      }
+
+      .ms-wrap {
+        color: #111;
+        max-width: 100%;
+        padding: 0
+      }
+
+      .ms-cover h1 {
+        color: #5B1A24
+      }
+
+      .ms-tema-hdr {
+        background: #f5e8cc;
+        border-left-color: #5B1A24
+      }
+
+      .ms-tema-hdr h2 {
+        color: #5B1A24
+      }
+
+      .ms-tema-hdr .num {
+        color: #777
+      }
+
+      .ms-sec h3 {
+        color: #5B1A24
+      }
+
+      .ms-sec li strong {
+        color: #5B1A24
+      }
+
+      .ms-box {
+        background: #fdf8ec;
+        border-color: #c8a84b
+      }
+
+      .ms-sec .ref {
+        color: #777
+      }
+
+      .ms-tema {
+        page-break-inside: avoid
+      }
+
+      .ms-cover {
+        border-bottom-color: #5B1A24
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div id="app"></div>
-<div id="loading" style="display:none;position:fixed;inset:0;background:rgba(11,8,16,.88);z-index:9998;align-items:center;justify-content:center;flex-direction:column;gap:14px">
-  <div class="spinner" style="width:34px;height:34px;border-width:3px"></div>
-  <p style="color:var(--gold);font-size:13px;letter-spacing:.04em">Carregando...</p>
-</div>
-<div id="toasts" style="position:fixed;bottom:18px;left:0;right:0;z-index:9999;pointer-events:none;display:flex;flex-direction:column-reverse;align-items:center;gap:7px;padding:0 16px"></div>
+  <div id="app"></div>
+  <div id="loading"
+    style="display:none;position:fixed;inset:0;background:rgba(11,8,16,.88);z-index:9998;align-items:center;justify-content:center;flex-direction:column;gap:14px">
+    <div class="spinner" style="width:34px;height:34px;border-width:3px"></div>
+    <p style="color:var(--gold);font-size:13px;letter-spacing:.04em">Carregando...</p>
+  </div>
+  <div id="toasts"
+    style="position:fixed;bottom:18px;left:0;right:0;z-index:9999;pointer-events:none;display:flex;flex-direction:column-reverse;align-items:center;gap:7px;padding:0 16px">
+  </div>
 
-<!-- MODAL QUESTÃO -->
-<div id="qmodal" class="modal-bg" onclick="closeModal(event)">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <h2 class="serif" style="font-size:18px;margin-bottom:16px" id="modal-title">Adicionar Questão</h2>
-    <div id="modal-err"></div>
+  <!-- MODAL QUESTÃO -->
+  <div id="qmodal" class="modal-bg" onclick="closeModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h2 class="serif" style="font-size:18px;margin-bottom:16px" id="modal-title">Adicionar Questão</h2>
+      <div id="modal-err"></div>
 
-    <div class="row2">
+      <div class="row2">
+        <div class="fg">
+          <label class="fl">Tema <span class="req">*</span></label>
+          <select class="fi" id="mf-tema"></select>
+        </div>
+        <div class="fg">
+          <label class="fl">Subtema / Categoria</label>
+          <input class="fi" id="mf-theme" type="text" placeholder="Ex: Liturgia, Objetos Sagrados...">
+        </div>
+      </div>
+
       <div class="fg">
-        <label class="fl">Tema <span class="req">*</span></label>
-        <select class="fi" id="mf-tema"></select>
+        <label class="fl">Enunciado da Questão <span class="req">*</span></label>
+        <textarea class="fi" id="mf-question" placeholder="Digite o enunciado completo da questão..."
+          style="min-height:100px"></textarea>
       </div>
+
+      <div class="dv" style="margin:10px 0"></div>
+      <p class="dim" style="font-size:12px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em">
+        Alternativas</p>
+
+      <div class="row2">
+        <div class="fg"><label class="fl">A <span class="req">*</span></label><input class="fi" id="mf-a" type="text"
+            placeholder="Alternativa A"></div>
+        <div class="fg"><label class="fl">B <span class="req">*</span></label><input class="fi" id="mf-b" type="text"
+            placeholder="Alternativa B"></div>
+      </div>
+      <div class="row2">
+        <div class="fg"><label class="fl">C <span class="req">*</span></label><input class="fi" id="mf-c" type="text"
+            placeholder="Alternativa C"></div>
+        <div class="fg"><label class="fl">D <span class="req">*</span></label><input class="fi" id="mf-d" type="text"
+            placeholder="Alternativa D"></div>
+      </div>
+
       <div class="fg">
-        <label class="fl">Subtema / Categoria</label>
-        <input class="fi" id="mf-theme" type="text" placeholder="Ex: Liturgia, Objetos Sagrados...">
+        <label class="fl">Resposta Correta <span class="req">*</span></label>
+        <div style="display:flex;gap:12px;margin-top:4px" id="mf-answer-group">
+          ${['A','B','C','D'].map((l,i)=>`
+          <label
+            style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1.5px solid var(--bdr);border-radius:var(--rsm);transition:var(--t);font-weight:600"
+            id="ans-lbl-${i}">
+            <input type="radio" name="mf_ans" value="${i}" style="accent-color:var(--gold)"> ${l}
+          </label>`).join('')}
+        </div>
       </div>
-    </div>
 
-    <div class="fg">
-      <label class="fl">Enunciado da Questão <span class="req">*</span></label>
-      <textarea class="fi" id="mf-question" placeholder="Digite o enunciado completo da questão..." style="min-height:100px"></textarea>
-    </div>
-
-    <div class="dv" style="margin:10px 0"></div>
-    <p class="dim" style="font-size:12px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em">Alternativas</p>
-
-    <div class="row2">
-      <div class="fg"><label class="fl">A <span class="req">*</span></label><input class="fi" id="mf-a" type="text" placeholder="Alternativa A"></div>
-      <div class="fg"><label class="fl">B <span class="req">*</span></label><input class="fi" id="mf-b" type="text" placeholder="Alternativa B"></div>
-    </div>
-    <div class="row2">
-      <div class="fg"><label class="fl">C <span class="req">*</span></label><input class="fi" id="mf-c" type="text" placeholder="Alternativa C"></div>
-      <div class="fg"><label class="fl">D <span class="req">*</span></label><input class="fi" id="mf-d" type="text" placeholder="Alternativa D"></div>
-    </div>
-
-    <div class="fg">
-      <label class="fl">Resposta Correta <span class="req">*</span></label>
-      <div style="display:flex;gap:12px;margin-top:4px" id="mf-answer-group">
-        ${['A','B','C','D'].map((l,i)=>`
-        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1.5px solid var(--bdr);border-radius:var(--rsm);transition:var(--t);font-weight:600" id="ans-lbl-${i}">
-          <input type="radio" name="mf_ans" value="${i}" style="accent-color:var(--gold)"> ${l}
-        </label>`).join('')}
+      <div class="fg">
+        <label class="fl">Explicação / Catequese <span class="optional">(recomendado)</span></label>
+        <textarea class="fi" id="mf-expl" placeholder="Breve explicação sobre a resposta correta..."
+          style="min-height:80px"></textarea>
       </div>
-    </div>
 
-    <div class="fg">
-      <label class="fl">Explicação / Catequese <span class="optional">(recomendado)</span></label>
-      <textarea class="fi" id="mf-expl" placeholder="Breve explicação sobre a resposta correta..." style="min-height:80px"></textarea>
-    </div>
-
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px">
-      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-gold" id="modal-save-btn" onclick="saveQuestion()" style="min-width:140px">Salvar Questão</button>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-gold" id="modal-save-btn" onclick="saveQuestion()" style="min-width:140px">Salvar
+          Questão</button>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- MODAL EDITAR TEMA -->
-<div id="tmodal" class="modal-bg" onclick="closeTemaModal(event)">
-  <div class="modal-box" style="max-width:480px" onclick="event.stopPropagation()">
-    <h2 class="serif" style="font-size:18px;margin-bottom:16px" id="tmodal-title">Editar Tema</h2>
-    <div id="tmodal-err"></div>
-    <input type="hidden" id="tm-id">
-    <div class="fg"><label class="fl">Ícone (emoji)</label>
-      <input class="fi" id="tm-icon" type="text" maxlength="4" placeholder="Ex: ✝ 📅 💧">
-    </div>
-    <div class="fg"><label class="fl">Nome do Tema <span class="req">*</span></label>
-      <input class="fi" id="tm-name" type="text" maxlength="80">
-    </div>
-    <div class="fg"><label class="fl">Descrição</label>
-      <textarea class="fi" id="tm-desc" style="min-height:80px"></textarea>
-    </div>
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
-      <button class="btn btn-ghost" onclick="closeTemaModal()">Cancelar</button>
-      <button class="btn btn-gold" onclick="saveTema()">Salvar</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL NOVA TRILHA -->
-<div id="ntmodal" class="modal-bg" onclick="closeNtModal(event)">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <h2 class="serif" style="font-size:18px;margin-bottom:4px">Nova Trilha</h2>
-    <p class="dim" style="font-size:13px;margin-bottom:18px">Defina o nome da trilha e seus temas (até 10). As questões serão adicionadas depois.</p>
-    <div id="ntmodal-err"></div>
-
-    <div class="row2">
-      <div class="fg">
-        <label class="fl">Ícone (emoji)</label>
-        <input class="fi" id="nt-icon" type="text" maxlength="4" placeholder="🎯">
+  <!-- MODAL EDITAR TEMA -->
+  <div id="tmodal" class="modal-bg" onclick="closeTemaModal(event)">
+    <div class="modal-box" style="max-width:480px" onclick="event.stopPropagation()">
+      <h2 class="serif" style="font-size:18px;margin-bottom:16px" id="tmodal-title">Editar Tema</h2>
+      <div id="tmodal-err"></div>
+      <input type="hidden" id="tm-id">
+      <div class="fg"><label class="fl">Ícone (emoji)</label>
+        <input class="fi" id="tm-icon" type="text" maxlength="4" placeholder="Ex: ✝ 📅 💧">
       </div>
-      <div class="fg">
-        <label class="fl">Nome da Trilha <span class="req">*</span></label>
-        <input class="fi" id="nt-name" type="text" maxlength="80" placeholder="Ex: Aprofundamento da Fé">
+      <div class="fg"><label class="fl">Nome do Tema <span class="req">*</span></label>
+        <input class="fi" id="tm-name" type="text" maxlength="80">
+      </div>
+      <div class="fg"><label class="fl">Descrição</label>
+        <textarea class="fi" id="tm-desc" style="min-height:80px"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+        <button class="btn btn-ghost" onclick="closeTemaModal()">Cancelar</button>
+        <button class="btn btn-gold" onclick="saveTema()">Salvar</button>
       </div>
     </div>
-    <div class="fg">
-      <label class="fl">Descrição</label>
-      <input class="fi" id="nt-desc" type="text" maxlength="200" placeholder="Breve descrição da trilha...">
-    </div>
+  </div>
 
-    <div class="dv"></div>
-    <p class="dim" style="font-size:12px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em">Temas desta Trilha</p>
-    <div id="nt-temas-list"></div>
-    <button class="btn btn-ghost btn-sm" onclick="addTemaRow()" style="margin-top:6px">+ Adicionar Tema</button>
+  <!-- MODAL NOVA TRILHA -->
+  <div id="ntmodal" class="modal-bg" onclick="closeNtModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h2 class="serif" style="font-size:18px;margin-bottom:4px">Nova Trilha</h2>
+      <p class="dim" style="font-size:13px;margin-bottom:18px">Defina o nome da trilha e seus temas (até 10). As
+        questões serão adicionadas depois.</p>
+      <div id="ntmodal-err"></div>
 
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
-      <button class="btn btn-ghost" onclick="closeNtModal()">Cancelar</button>
-      <button class="btn btn-gold" id="nt-save-btn" onclick="saveTrilha()" style="min-width:140px">Criar Trilha</button>
+      <div class="row2">
+        <div class="fg">
+          <label class="fl">Ícone (emoji)</label>
+          <input class="fi" id="nt-icon" type="text" maxlength="4" placeholder="🎯">
+        </div>
+        <div class="fg">
+          <label class="fl">Nome da Trilha <span class="req">*</span></label>
+          <input class="fi" id="nt-name" type="text" maxlength="80" placeholder="Ex: Aprofundamento da Fé">
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">Descrição</label>
+        <input class="fi" id="nt-desc" type="text" maxlength="200" placeholder="Breve descrição da trilha...">
+      </div>
+
+      <div class="dv"></div>
+      <p class="dim" style="font-size:12px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em">Temas desta
+        Trilha</p>
+      <div id="nt-temas-list"></div>
+      <button class="btn btn-ghost btn-sm" onclick="addTemaRow()" style="margin-top:6px">+ Adicionar Tema</button>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+        <button class="btn btn-ghost" onclick="closeNtModal()">Cancelar</button>
+        <button class="btn btn-gold" id="nt-save-btn" onclick="saveTrilha()" style="min-width:140px">Criar
+          Trilha</button>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-// ═══════════════════════════════════════════════════════════
-// CONSTANTES DO JOGO
-// ═══════════════════════════════════════════════════════════
-const QPE      = 10;   // Questões por etapa (tema)
-const SKIP_PEN = 10;
-const BASE_VAL = 10;
-const PASS_THR = 50;
-const LETTERS  = ['A','B','C','D'];
+  <script>
+    // ═══════════════════════════════════════════════════════════
+    // CONSTANTES DO JOGO
+    // ═══════════════════════════════════════════════════════════
+    const QPE = 10;   // Questões por etapa (tema)
+    const SKIP_PEN = 10;
+    const BASE_VAL = 10;
+    const PASS_THR = 50;
+    const LETTERS = ['A', 'B', 'C', 'D'];
 
-const ROLES = [
-  {v:'coroinha',l:'Coroinha'},{v:'acolito',l:'Acólito'},{v:'leitor',l:'Leitor(a)'},
-  {v:'min_euc',l:'Ministro(a) da Eucaristia'},{v:'catequista',l:'Catequista'},
-  {v:'coord_lit',l:'Coordenador(a) de Liturgia'},{v:'coro',l:'Coro / Cantor(a)'},
-  {v:'conselho',l:'Conselho Pastoral'},{v:'monitor',l:'Monitor(a) / Formador(a)'},
-  {v:'outro',l:'Outra Função na Igreja'},
-];
-function roleLabel(r,c){if(r==='outro'&&c)return c;return ROLES.find(x=>x.v===r)?.l||r||'—'}
+    const ROLES = [
+      { v: 'coroinha', l: 'Coroinha' }, { v: 'acolito', l: 'Acólito' }, { v: 'leitor', l: 'Leitor(a)' },
+      { v: 'min_euc', l: 'Ministro(a) da Eucaristia' }, { v: 'catequista', l: 'Catequista' },
+      { v: 'coord_lit', l: 'Coordenador(a) de Liturgia' }, { v: 'coro', l: 'Coro / Cantor(a)' },
+      { v: 'conselho', l: 'Conselho Pastoral' }, { v: 'monitor', l: 'Monitor(a) / Formador(a)' },
+      { v: 'outro', l: 'Outra Função na Igreja' },
+    ];
+    function roleLabel(r, c) { if (r === 'outro' && c) return c; return ROLES.find(x => x.v === r)?.l || r || '—' }
 
-const DEMO_Q = [
-  {id:'d1',theme:'Objetos Sagrados',question:'Qual é o nome do vaso sagrado utilizado na Missa para conter o vinho que, após a Consagração, se torna o Sangue de Cristo?',opts:['Píxide','Cálice','Ostensório','Âmbula'],ans:1,exp:'O <strong>Cálice</strong> é o vaso litúrgico que contém o vinho transformado no precioso Sangue de Cristo.'},
-  {id:'d2',theme:'Liturgia',question:'O que é o Turíbulo, objeto presente nas celebrações solenes?',opts:['O livro das orações da Missa','O recipiente das hóstias consagradas','O incensário onde se queima o incenso','A toalha que cobre o altar'],ans:2,exp:'O <strong>Turíbulo</strong> é usado para queimar incenso. O coroinha responsável chama-se turiferário.'},
-  {id:'d3',theme:'Tempos Litúrgicos',question:'Qual tempo litúrgico prepara a Igreja para o Natal, marcado pela cor roxa?',opts:['Quaresma','Pentecostes','Advento','Tempo Comum'],ans:2,exp:'O <strong>Advento</strong> é o tempo de preparação para o Natal.'},
-];
+    const DEMO_Q = [
+      { id: 'd1', theme: 'Objetos Sagrados', question: 'Qual é o nome do vaso sagrado utilizado na Missa para conter o vinho que, após a Consagração, se torna o Sangue de Cristo?', opts: ['Píxide', 'Cálice', 'Ostensório', 'Âmbula'], ans: 1, exp: 'O <strong>Cálice</strong> é o vaso litúrgico que contém o vinho transformado no precioso Sangue de Cristo.' },
+      { id: 'd2', theme: 'Liturgia', question: 'O que é o Turíbulo, objeto presente nas celebrações solenes?', opts: ['O livro das orações da Missa', 'O recipiente das hóstias consagradas', 'O incensário onde se queima o incenso', 'A toalha que cobre o altar'], ans: 2, exp: 'O <strong>Turíbulo</strong> é usado para queimar incenso. O coroinha responsável chama-se turiferário.' },
+      { id: 'd3', theme: 'Tempos Litúrgicos', question: 'Qual tempo litúrgico prepara a Igreja para o Natal, marcado pela cor roxa?', opts: ['Quaresma', 'Pentecostes', 'Advento', 'Tempo Comum'], ans: 2, exp: 'O <strong>Advento</strong> é o tempo de preparação para o Natal.' },
+    ];
 
-// ═══════════════════════════════════════════════════════════
-// ESTADO GLOBAL
-// ═══════════════════════════════════════════════════════════
-const S = {
-  screen:   'login',
-  token:    localStorage.getItem('dsa_token'),
-  user:     JSON.parse(localStorage.getItem('dsa_user')||'null'),
-  progress: [],
-  rankData: [],
-  trilhas:  [],
-  trilha:   null,   // trilha selecionada (com temas embutidos)
-  stageIdx: 0,
-  quiz:     null,
-  result:   null,
-  adm: {
-    tab:       'questions',
-    trilhas:   [],
-    temas:     [],
-    selTema:   null,
-    questions: [],
-    total:     0,
-    pages:     1,
-    page:      1,
-    stats:     null,
-    editingQ:  null,
-  }
-};
+    // ═══════════════════════════════════════════════════════════
+    // ESTADO GLOBAL
+    // ═══════════════════════════════════════════════════════════
+    const S = {
+      screen: 'login',
+      token: localStorage.getItem('dsa_token'),
+      user: JSON.parse(localStorage.getItem('dsa_user') || 'null'),
+      progress: [],
+      rankData: [],
+      trilhas: [],
+      trilha: null,   // trilha selecionada (com temas embutidos)
+      stageIdx: 0,
+      quiz: null,
+      result: null,
+      adm: {
+        tab: 'questions',
+        trilhas: [],
+        temas: [],
+        selTema: null,
+        questions: [],
+        total: 0,
+        pages: 1,
+        page: 1,
+        stats: null,
+        editingQ: null,
+      }
+    };
 
-// ═══════════════════════════════════════════════════════════
-// URL BASE DA API
-// Em produção (Hostinger): aponta para o backend no Render.com
-// Em dev local: string vazia = mesma origem (localhost:3000)
-// ═══════════════════════════════════════════════════════════
-const API_BASE = 'https://dsa-api.onrender.com'; // ← ALTERAR para a URL do seu serviço no Render
-// const API_BASE = ''; // ← descomente esta linha para desenvolvimento local
+    // ═══════════════════════════════════════════════════════════
+    // URL BASE DA API
+    // Em produção (Hostinger): aponta para o backend no Render.com
+    // Em dev local: string vazia = mesma origem (localhost:3000)
+    // ═══════════════════════════════════════════════════════════
+    const API_BASE = window.location.hostname === 'dsa.servidoresdoaltar.site'
+      ? 'https://dsa-api-5m8a.onrender.com'
+      : '';
 
-// ═══════════════════════════════════════════════════════════
-// API HELPER
-// ═══════════════════════════════════════════════════════════
-async function api(method, path, body) {
-  const h = {'Content-Type':'application/json'};
-  if (S.token) h['Authorization'] = 'Bearer ' + S.token;
-  const res  = await fetch(API_BASE + path, {method, headers:h, body:body?JSON.stringify(body):undefined});
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error||'Erro desconhecido');
-  return data;
-}
+    // ═══════════════════════════════════════════════════════════
+    // API HELPER
+    // ═══════════════════════════════════════════════════════════
+    async function api(method, path, body) {
+      const h = { 'Content-Type': 'application/json' };
+      if (S.token) h['Authorization'] = 'Bearer ' + S.token;
+      const res = await fetch(API_BASE + path, { method, headers: h, body: body ? JSON.stringify(body) : undefined });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erro desconhecido');
+      return data;
+    }
 
-// ═══════════════════════════════════════════════════════════
-// AUTH
-// ═══════════════════════════════════════════════════════════
-function setAuth(token, user) {
-  S.token=token; S.user=user;
-  localStorage.setItem('dsa_token',token);
-  localStorage.setItem('dsa_user',JSON.stringify(user));
-}
-function clearAuth() {
-  S.token=null; S.user=null;
-  localStorage.removeItem('dsa_token');
-  localStorage.removeItem('dsa_user');
-}
+    // ═══════════════════════════════════════════════════════════
+    // AUTH
+    // ═══════════════════════════════════════════════════════════
+    function setAuth(token, user) {
+      S.token = token; S.user = user;
+      localStorage.setItem('dsa_token', token);
+      localStorage.setItem('dsa_user', JSON.stringify(user));
+    }
+    function clearAuth() {
+      S.token = null; S.user = null;
+      localStorage.removeItem('dsa_token');
+      localStorage.removeItem('dsa_user');
+    }
 
-// ═══════════════════════════════════════════════════════════
-// LOADING & TOAST
-// ═══════════════════════════════════════════════════════════
-function showLoad(){document.getElementById('loading').style.display='flex'}
-function hideLoad(){document.getElementById('loading').style.display='none'}
+    // ═══════════════════════════════════════════════════════════
+    // LOADING & TOAST
+    // ═══════════════════════════════════════════════════════════
+    function showLoad() { document.getElementById('loading').style.display = 'flex' }
+    function hideLoad() { document.getElementById('loading').style.display = 'none' }
 
-function toast(msg,type='tinfo',ms=3200){
-  const el=document.createElement('div');
-  el.className=`toast ${type}`;el.innerHTML=msg;
-  document.getElementById('toasts').appendChild(el);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('show')));
-  setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),300)},ms);
-}
-function showErr(el,msg){
-  if(typeof el==='string')el=document.getElementById(el);
-  if(el)el.innerHTML=`<div class="form-err">${msg}</div>`;
-}
+    function toast(msg, type = 'tinfo', ms = 3200) {
+      const el = document.createElement('div');
+      el.className = `toast ${type}`; el.innerHTML = msg;
+      document.getElementById('toasts').appendChild(el);
+      requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
+      setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300) }, ms);
+    }
+    function showErr(el, msg) {
+      if (typeof el === 'string') el = document.getElementById(el);
+      if (el) el.innerHTML = `<div class="form-err">${msg}</div>`;
+    }
 
-// ═══════════════════════════════════════════════════════════
-// NAVEGAÇÃO
-// ═══════════════════════════════════════════════════════════
-async function go(scr) {
-  stopTimer();
-  try {
-    if(scr==='dashboard'){
+    // ═══════════════════════════════════════════════════════════
+    // NAVEGAÇÃO
+    // ═══════════════════════════════════════════════════════════
+    async function go(scr) {
+      stopTimer();
+      try {
+        if (scr === 'dashboard') {
+          showLoad();
+          const trilhas = await api('GET', '/api/trilhas');
+          S.progress = loadLocalProgress();
+          S.trilhas  = trilhas;
+          if (!S.trilha || !trilhas.find(t => t._id === S.trilha._id)) {
+            S.trilha = trilhas.find(t => !isTrilhaComplete(t, S.progress)) || trilhas[0] || null;
+          } else {
+            S.trilha = trilhas.find(t => t._id === S.trilha._id) || trilhas[0];
+          }
+          hideLoad();
+        }
+        if (scr === 'admin') { showLoad(); await admLoad(); hideLoad(); }
+      } catch (e) {
+        hideLoad();
+        toast(e.message, 'terr');
+      }
+      S.screen = scr; render(); window.scrollTo(0, 0);
+    }
+
+    function logout() { clearAuth(); S.screen = 'dashboard'; init(); }
+
+    function isTrilhaComplete(trilha, progress) {
+      const temas = trilha.temas || [];
+      return temas.every((_, i) => {
+        const p = progress.find(p => p.trilha_id === trilha._id && p.tema_index === i);
+        return p && p.completed;
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // HELPERS DE PROGRESSO
+    // ═══════════════════════════════════════════════════════════
+    function getProgT(trilhaId, temaIndex) {
+      return S.progress.find(p => p.trilha_id === trilhaId && p.tema_index === temaIndex)
+        || { completed: 0, score: 0, first_attempt_rate: 0, time_seconds: 0 };
+    }
+    function totalScore() { return S.progress.filter(p => p.completed).reduce((s, p) => s + p.score, 0) }
+    function totalTime() { return S.progress.filter(p => p.completed).reduce((s, p) => s + p.time_seconds, 0) }
+    function doneCount() {
+      if (!S.trilha) return 0;
+      return S.progress.filter(p => p.completed && p.trilha_id === S.trilha._id).length;
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // QUIZ
+    // ═══════════════════════════════════════════════════════════
+    function shuffle(a) { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[b[i], b[j]] = [b[j], b[i]]; } return b; }
+    function fmtTime(s) { return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0') }
+
+    async function startStage(idx) {
       showLoad();
-      const [progress, trilhas] = await Promise.all([
-        api('GET','/api/progress'),
-        api('GET','/api/trilhas')
-      ]);
-      S.progress = progress;
-      S.trilhas  = trilhas;
-      // Seleciona a trilha atual (última não completa, ou primeira)
-      if (!S.trilha || !trilhas.find(t=>t._id===S.trilha._id)) {
-        S.trilha = trilhas.find(t => !isTrilhaComplete(t, progress)) || trilhas[0] || null;
-      } else {
-        S.trilha = trilhas.find(t=>t._id===S.trilha._id) || trilhas[0];
-      }
+      const trilha = S.trilha;
+      const temaId = trilha?.temaIds?.[idx];
+      let qs;
+      try {
+        if (temaId) {
+          const remote = await api('GET', `/api/quiz/${temaId}`);
+          if (remote.length > 0) {
+            qs = remote.map(q => ({ id: q.id, theme: q.theme, question: q.question, opts: q.options, ans: q.answer, exp: q.explanation }));
+          }
+        }
+      } catch (_) { }
+      if (!qs || !qs.length) qs = shuffle(DEMO_Q).slice(0, Math.min(QPE, DEMO_Q.length));
       hideLoad();
+
+      S.stageIdx = idx;
+      S.quiz = {
+        idx, qs, ci: 0, val: BASE_VAL, attempts: 0,
+        score: 0, fa: 0, timer: 0, iv: null,
+        phase: 'q', lastWrong: -1, wrongTO: null
+      };
+      S.screen = 'quiz'; render(); window.scrollTo(0, 0);
+      startTimer();
     }
-    if(scr==='ranking'){showLoad();S.rankData=await api('GET','/api/ranking');hideLoad();}
-    if(scr==='admin'){showLoad();await admLoad();hideLoad();}
-  } catch(e){
-    hideLoad();
-    if(e.message.includes('utenticad')||e.message.includes('xpira')){clearAuth();scr='login';}
-    toast(e.message,'terr');
-  }
-  S.screen=scr; render(); window.scrollTo(0,0);
-}
 
-function logout(){clearAuth();S.progress=[];S.rankData=[];S.trilhas=[];S.trilha=null;S.screen='login';render();}
+    function startTimer() {
+      if (S.quiz.iv) clearInterval(S.quiz.iv);
+      S.quiz.iv = setInterval(() => {
+        S.quiz.timer++;
+        const el = document.getElementById('qtimer');
+        if (el) el.textContent = fmtTime(S.quiz.timer);
+      }, 1000);
+    }
+    function stopTimer() { if (S.quiz?.iv) { clearInterval(S.quiz.iv); S.quiz.iv = null; } }
 
-function isTrilhaComplete(trilha, progress) {
-  const temas = trilha.temas || [];
-  return temas.every((_,i) => {
-    const p = progress.find(p => p.trilha_id===trilha._id && p.tema_index===i);
-    return p && p.completed;
-  });
-}
-
-// ═══════════════════════════════════════════════════════════
-// HELPERS DE PROGRESSO
-// ═══════════════════════════════════════════════════════════
-function getProgT(trilhaId, temaIndex) {
-  return S.progress.find(p=>p.trilha_id===trilhaId && p.tema_index===temaIndex)
-    ||{completed:0,score:0,first_attempt_rate:0,time_seconds:0};
-}
-function totalScore(){return S.progress.filter(p=>p.completed).reduce((s,p)=>s+p.score,0)}
-function totalTime(){return S.progress.filter(p=>p.completed).reduce((s,p)=>s+p.time_seconds,0)}
-function doneCount(){
-  if(!S.trilha)return 0;
-  return S.progress.filter(p=>p.completed&&p.trilha_id===S.trilha._id).length;
-}
-
-// ═══════════════════════════════════════════════════════════
-// QUIZ
-// ═══════════════════════════════════════════════════════════
-function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
-function fmtTime(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
-
-async function startStage(idx) {
-  showLoad();
-  const trilha = S.trilha;
-  const temaId = trilha?.temaIds?.[idx];
-  let qs;
-  try {
-    if (temaId) {
-      const remote = await api('GET', `/api/quiz/${temaId}`);
-      if (remote.length > 0) {
-        qs = remote.map(q=>({id:q.id,theme:q.theme,question:q.question,opts:q.options,ans:q.answer,exp:q.explanation}));
+    function pick(i) {
+      const q = S.quiz; if (q.phase === 'ok') return;
+      const cur = q.qs[q.ci];
+      if (i === cur.ans) {
+        q.phase = 'ok'; if (q.attempts === 0) q.fa++; q.score += q.val; qUpdate();
+      } else {
+        if (q.wrongTO) clearTimeout(q.wrongTO);
+        q.phase = 'err'; q.attempts++; q.lastWrong = i;
+        q.val = Math.max(0, BASE_VAL - q.attempts); qUpdate();
+        q.wrongTO = setTimeout(() => { if (S.quiz?.phase === 'err' && S.screen === 'quiz') { S.quiz.phase = 'q'; qUpdate(); } }, 1600);
       }
     }
-  } catch(_){}
-  if (!qs||!qs.length) qs = shuffle(DEMO_Q).slice(0, Math.min(QPE, DEMO_Q.length));
-  hideLoad();
+    function skip() { const q = S.quiz; if (q.phase === 'ok') return; if (q.wrongTO) { clearTimeout(q.wrongTO); q.wrongTO = null; } q.score -= SKIP_PEN; advance(); }
+    function next() { advance(); }
+    function advance() {
+      const q = S.quiz; q.val = BASE_VAL; q.attempts = 0; q.lastWrong = -1; q.phase = 'q'; q.wrongTO = null; q.ci++;
+      if (q.ci >= q.qs.length) endStage(); else { qUpdate(); window.scrollTo(0, 0); }
+    }
 
-  S.stageIdx=idx;
-  S.quiz={
-    idx, qs, ci:0, val:BASE_VAL, attempts:0,
-    score:0, fa:0, timer:0, iv:null,
-    phase:'q', lastWrong:-1, wrongTO:null
-  };
-  S.screen='quiz'; render(); window.scrollTo(0,0);
-  startTimer();
-}
+    async function endStage() {
+      stopTimer(); const q = S.quiz;
+      const far = (q.fa / q.qs.length) * 100, passed = far > PASS_THR;
+      S.result = { idx: q.idx, score: q.score, far, passed, time: q.timer, fa: q.fa, total: q.qs.length };
+      if (passed) {
+        // Salva progresso localmente (sem login necessário)
+        S.progress = saveLocalProgress(S.trilha._id, q.idx, {
+          score: q.score, first_attempt_rate: far,
+          time_seconds: q.timer, completed: 1
+        });
+      }
+      S.screen = 'stageEnd'; render(); window.scrollTo(0, 0);
+    }
 
-function startTimer(){
-  if(S.quiz.iv)clearInterval(S.quiz.iv);
-  S.quiz.iv=setInterval(()=>{
-    S.quiz.timer++;
-    const el=document.getElementById('qtimer');
-    if(el)el.textContent=fmtTime(S.quiz.timer);
-  },1000);
-}
-function stopTimer(){if(S.quiz?.iv){clearInterval(S.quiz.iv);S.quiz.iv=null;}}
+    function qUpdate() {
+      const el = document.getElementById('qinner'); if (el) el.innerHTML = qInner();
+      const se = document.getElementById('qscore'); if (se) se.textContent = S.quiz.score + ' pts';
+      const pf = document.getElementById('qprog'); if (pf) pf.style.width = (S.quiz.ci / S.quiz.qs.length * 100) + '%';
+    }
 
-function pick(i){
-  const q=S.quiz;if(q.phase==='ok')return;
-  const cur=q.qs[q.ci];
-  if(i===cur.ans){
-    q.phase='ok';if(q.attempts===0)q.fa++;q.score+=q.val;qUpdate();
-  } else {
-    if(q.wrongTO)clearTimeout(q.wrongTO);
-    q.phase='err';q.attempts++;q.lastWrong=i;
-    q.val=Math.max(0,BASE_VAL-q.attempts);qUpdate();
-    q.wrongTO=setTimeout(()=>{if(S.quiz?.phase==='err'&&S.screen==='quiz'){S.quiz.phase='q';qUpdate();}},1600);
-  }
-}
-function skip(){const q=S.quiz;if(q.phase==='ok')return;if(q.wrongTO){clearTimeout(q.wrongTO);q.wrongTO=null;}q.score-=SKIP_PEN;advance();}
-function next(){advance();}
-function advance(){
-  const q=S.quiz;q.val=BASE_VAL;q.attempts=0;q.lastWrong=-1;q.phase='q';q.wrongTO=null;q.ci++;
-  if(q.ci>=q.qs.length)endStage();else{qUpdate();window.scrollTo(0,0);}
-}
-
-async function endStage(){
-  stopTimer();const q=S.quiz;
-  const far=(q.fa/q.qs.length)*100,passed=far>PASS_THR;
-  S.result={idx:q.idx,score:q.score,far,passed,time:q.timer,fa:q.fa,total:q.qs.length};
-  if(passed){
-    showLoad();
-    try{
-      const trilhaId=S.trilha._id;
-      await api('POST',`/api/progress/${trilhaId}/${q.idx}`,{score:q.score,firstAttemptRate:far,timeSec:q.timer,completed:true});
-      S.progress=await api('GET','/api/progress');
-    }catch(e){toast('Erro ao salvar progresso: '+e.message,'terr');}
-    hideLoad();
-  }
-  S.screen='stageEnd';render();window.scrollTo(0,0);
-}
-
-function qUpdate(){
-  const el=document.getElementById('qinner');if(el)el.innerHTML=qInner();
-  const se=document.getElementById('qscore');if(se)se.textContent=S.quiz.score+' pts';
-  const pf=document.getElementById('qprog');if(pf)pf.style.width=(S.quiz.ci/S.quiz.qs.length*100)+'%';
-}
-
-// ═══════════════════════════════════════════════════════════
-// TELAS DE AUTENTICAÇÃO
-// ═══════════════════════════════════════════════════════════
-function rLogin(){return`<div class="screen" style="justify-content:center;align-items:center;padding:20px;background:radial-gradient(ellipse at top,rgba(115,24,40,.22) 0%,transparent 60%)">
+    // ═══════════════════════════════════════════════════════════
+    // TELAS DE AUTENTICAÇÃO
+    // ═══════════════════════════════════════════════════════════
+    function rLogin() {
+      return `<div class="screen" style="justify-content:center;align-items:center;padding:20px;background:radial-gradient(ellipse at top,rgba(115,24,40,.22) 0%,transparent 60%)">
 <div class="ctr-sm"><div class="logo-wrap"><span class="logo-cross serif">✝</span>
 <h1 class="serif gold" style="font-size:28px;letter-spacing:.07em;margin-bottom:5px">DSA</h1>
 <p class="dim" style="font-size:11px;letter-spacing:.12em;text-transform:uppercase">Desafio dos Servidores do Altar</p></div>
@@ -609,26 +1683,27 @@ function rLogin(){return`<div class="screen" style="justify-content:center;align
 <div class="dv-text">ou</div>
 <button class="btn btn-wine btn-full" onclick="go('register')" style="font-size:14px;padding:12px">Criar Cadastro</button>
 <p style="text-align:center;font-size:11px;color:var(--dim2);margin-top:20px">"Felizes os que habitam na tua casa, Senhor!" — Sl 84,5</p>
-</div></div>`;}
+</div></div>`;
+    }
 
-async function doLogin(){
-  const e=document.getElementById('le').value.trim(),p=document.getElementById('lp').value;
-  const err=document.getElementById('lerr');err.innerHTML='';
-  if(!e||!p){showErr(err,'Preencha e-mail e senha.');return;}
-  const btn=document.getElementById('login-btn');
-  btn.disabled=true;btn.innerHTML='<span class="spinner" style="width:16px;height:16px;border-width:2px"></span> Entrando...';
-  try{
-    const d=await api('POST','/api/auth/login',{email:e,password:p});
-    setAuth(d.token,d.user);
-    if(d.user.role==='support'){showLoad();await admLoad();hideLoad();S.screen='admin';render();}
-    else await go('dashboard');
-  }catch(ex){showErr(err,ex.message);}
-  finally{btn.disabled=false;btn.innerHTML='Entrar &nbsp;✝';}
-}
+    async function doLogin() {
+      const e = document.getElementById('le').value.trim(), p = document.getElementById('lp').value;
+      const err = document.getElementById('lerr'); err.innerHTML = '';
+      if (!e || !p) { showErr(err, 'Preencha e-mail e senha.'); return; }
+      const btn = document.getElementById('login-btn');
+      btn.disabled = true; btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px"></span> Entrando...';
+      try {
+        const d = await api('POST', '/api/auth/login', { email: e, password: p });
+        setAuth(d.token, d.user);
+        if (d.user.role === 'support') { showLoad(); await admLoad(); hideLoad(); S.screen = 'admin'; render(); }
+        else await go('dashboard');
+      } catch (ex) { showErr(err, ex.message); }
+      finally { btn.disabled = false; btn.innerHTML = 'Entrar &nbsp;✝'; }
+    }
 
-function rRegister(){
-  const opts=ROLES.map(r=>`<option value="${r.v}">${r.l}</option>`).join('');
-  return`<div class="screen" style="padding:20px 0 40px;background:radial-gradient(ellipse at top,rgba(115,24,40,.18) 0%,transparent 55%)">
+    function rRegister() {
+      const opts = ROLES.map(r => `<option value="${r.v}">${r.l}</option>`).join('');
+      return `<div class="screen" style="padding:20px 0 40px;background:radial-gradient(ellipse at top,rgba(115,24,40,.18) 0%,transparent 55%)">
 <div class="ctr-sm"><div class="logo-wrap" style="padding:24px 0 18px">
 <span class="logo-cross serif" style="font-size:36px">✝</span>
 <h1 class="serif gold" style="font-size:22px;margin-bottom:4px">Criar Cadastro</h1>
@@ -667,31 +1742,33 @@ function rRegister(){
 </div>
 <div class="dv-text">já tem conta?</div>
 <button class="btn btn-ghost btn-full" onclick="go('login')" style="font-size:14px;padding:11px">← Voltar ao Login</button>
-</div></div>`;}
+</div></div>`;
+    }
 
-function onRoleChange(){const v=document.getElementById('rr')?.value,g=document.getElementById('rcg');if(g)g.style.display=v==='outro'?'block':'none';}
+    function onRoleChange() { const v = document.getElementById('rr')?.value, g = document.getElementById('rcg'); if (g) g.style.display = v === 'outro' ? 'block' : 'none'; }
 
-async function doRegister(){
-  const err=document.getElementById('rerr');err.innerHTML='';
-  const n=document.getElementById('rn').value.trim(),e=document.getElementById('re').value.trim(),
-        r=document.getElementById('rr').value,rc=document.getElementById('rrc')?.value.trim(),
-        ci=document.getElementById('rci').value.trim(),pa=document.getElementById('rpa').value.trim(),
-        mv=document.getElementById('rm').value.trim(),
-        p=document.getElementById('rp').value,p2=document.getElementById('rp2').value;
-  if(!n||!e||!r||!ci||!pa||!p||!p2){showErr(err,'Preencha todos os campos obrigatórios.');return;}
-  if(r==='outro'&&!rc){showErr(err,'Descreva sua função na Igreja.');return;}
-  if(p.length<6){showErr(err,'A senha precisa ter no mínimo 6 caracteres.');return;}
-  if(p!==p2){showErr(err,'As senhas não conferem.');return;}
-  const btn=document.getElementById('reg-btn');
-  btn.disabled=true;btn.innerHTML='<span class="spinner" style="width:16px;height:16px;border-width:2px"></span> Criando...';
-  try{
-    const d=await api('POST','/api/auth/register',{name:n,email:e,password:p,role:r,roleCustom:rc||null,city:ci,parish:pa,movement:mv||null});
-    setAuth(d.token,d.user);toast('Cadastro criado! Bem-vindo(a)! ✝','tok',3000);await go('dashboard');
-  }catch(ex){showErr(err,ex.message);}
-  finally{btn.disabled=false;btn.innerHTML='Criar Meu Cadastro &nbsp;✝';}
-}
+    async function doRegister() {
+      const err = document.getElementById('rerr'); err.innerHTML = '';
+      const n = document.getElementById('rn').value.trim(), e = document.getElementById('re').value.trim(),
+        r = document.getElementById('rr').value, rc = document.getElementById('rrc')?.value.trim(),
+        ci = document.getElementById('rci').value.trim(), pa = document.getElementById('rpa').value.trim(),
+        mv = document.getElementById('rm').value.trim(),
+        p = document.getElementById('rp').value, p2 = document.getElementById('rp2').value;
+      if (!n || !e || !r || !ci || !pa || !p || !p2) { showErr(err, 'Preencha todos os campos obrigatórios.'); return; }
+      if (r === 'outro' && !rc) { showErr(err, 'Descreva sua função na Igreja.'); return; }
+      if (p.length < 6) { showErr(err, 'A senha precisa ter no mínimo 6 caracteres.'); return; }
+      if (p !== p2) { showErr(err, 'As senhas não conferem.'); return; }
+      const btn = document.getElementById('reg-btn');
+      btn.disabled = true; btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px"></span> Criando...';
+      try {
+        const d = await api('POST', '/api/auth/register', { name: n, email: e, password: p, role: r, roleCustom: rc || null, city: ci, parish: pa, movement: mv || null });
+        setAuth(d.token, d.user); toast('Cadastro criado! Bem-vindo(a)! ✝', 'tok', 3000); await go('dashboard');
+      } catch (ex) { showErr(err, ex.message); }
+      finally { btn.disabled = false; btn.innerHTML = 'Criar Meu Cadastro &nbsp;✝'; }
+    }
 
-function rForgot(){return`<div class="screen" style="justify-content:center;align-items:center;padding:20px;background:radial-gradient(ellipse at top,rgba(115,24,40,.2) 0%,transparent 60%)">
+    function rForgot() {
+      return `<div class="screen" style="justify-content:center;align-items:center;padding:20px;background:radial-gradient(ellipse at top,rgba(115,24,40,.2) 0%,transparent 60%)">
 <div class="ctr-sm"><div class="logo-wrap"><span class="logo-cross serif" style="font-size:36px">✝</span>
 <h1 class="serif gold" style="font-size:20px;margin-bottom:4px">Recuperar Senha</h1></div>
 <div class="card"><p class="dim" style="font-size:13px;margin-bottom:18px;line-height:1.6">Informe o e-mail cadastrado. Se houver uma conta, enviaremos um link para criar uma nova senha.</p>
@@ -701,22 +1778,24 @@ function rForgot(){return`<div class="screen" style="justify-content:center;alig
 <button class="btn btn-gold btn-full" id="forgot-btn" onclick="doForgot()" style="font-size:15px;padding:13px">Enviar Link de Recuperação</button>
 </div></div>
 <div style="text-align:center;margin-top:18px"><button class="btn-link" onclick="go('login')">← Voltar ao Login</button></div>
-</div></div>`;}
+</div></div>`;
+    }
 
-async function doForgot(){
-  const email=document.getElementById('fe').value.trim();
-  const err=document.getElementById('ferr'),ok=document.getElementById('fok');err.innerHTML='';ok.innerHTML='';
-  if(!email){showErr(err,'Informe seu e-mail.');return;}
-  const btn=document.getElementById('forgot-btn');
-  btn.disabled=true;btn.innerHTML='<span class="spinner" style="width:16px;height:16px;border-width:2px"></span> Enviando...';
-  try{
-    await api('POST','/api/auth/forgot-password',{email});
-    document.getElementById('fform').innerHTML='';
-    ok.innerHTML='<div class="form-ok">✓ Se houver uma conta com este e-mail, você receberá o link em instantes.<br><small class="dim">Em modo dev, o link aparece no console do servidor.</small></div>';
-  }catch(ex){showErr(err,ex.message);btn.disabled=false;btn.innerHTML='Enviar Link de Recuperação';}
-}
+    async function doForgot() {
+      const email = document.getElementById('fe').value.trim();
+      const err = document.getElementById('ferr'), ok = document.getElementById('fok'); err.innerHTML = ''; ok.innerHTML = '';
+      if (!email) { showErr(err, 'Informe seu e-mail.'); return; }
+      const btn = document.getElementById('forgot-btn');
+      btn.disabled = true; btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px"></span> Enviando...';
+      try {
+        await api('POST', '/api/auth/forgot-password', { email });
+        document.getElementById('fform').innerHTML = '';
+        ok.innerHTML = '<div class="form-ok">✓ Se houver uma conta com este e-mail, você receberá o link em instantes.<br><small class="dim">Em modo dev, o link aparece no console do servidor.</small></div>';
+      } catch (ex) { showErr(err, ex.message); btn.disabled = false; btn.innerHTML = 'Enviar Link de Recuperação'; }
+    }
 
-function rReset(){return`<div class="screen" style="justify-content:center;align-items:center;padding:20px;background:radial-gradient(ellipse at top,rgba(115,24,40,.2) 0%,transparent 60%)">
+    function rReset() {
+      return `<div class="screen" style="justify-content:center;align-items:center;padding:20px;background:radial-gradient(ellipse at top,rgba(115,24,40,.2) 0%,transparent 60%)">
 <div class="ctr-sm"><div class="logo-wrap"><span class="logo-cross serif" style="font-size:36px">✝</span>
 <h1 class="serif gold" style="font-size:20px;margin-bottom:4px">Nova Senha</h1></div>
 <div class="card"><p class="dim" style="font-size:13px;margin-bottom:18px">Crie uma nova senha de acesso.</p>
@@ -729,182 +1808,204 @@ function rReset(){return`<div class="screen" style="justify-content:center;align
 <input class="fi" id="rsp2" type="password" placeholder="Repita a nova senha">
 <button class="pw-eye" onclick="togglePwd('rsp2')">👁</button></div></div>
 <button class="btn btn-gold btn-full" id="reset-btn" onclick="doReset()" style="font-size:15px;padding:13px">Salvar Nova Senha</button>
-</div></div></div></div>`;}
+</div></div></div></div>`;
+    }
 
-async function doReset(){
-  const p=document.getElementById('rsp').value,p2=document.getElementById('rsp2').value;
-  const err=document.getElementById('rserr'),ok=document.getElementById('rsok');err.innerHTML='';ok.innerHTML='';
-  if(!p||!p2){showErr(err,'Preencha os dois campos.');return;}
-  if(p.length<6){showErr(err,'A senha precisa ter no mínimo 6 caracteres.');return;}
-  if(p!==p2){showErr(err,'As senhas não conferem.');return;}
-  const btn=document.getElementById('reset-btn');
-  btn.disabled=true;btn.innerHTML='<span class="spinner" style="width:16px;height:16px;border-width:2px"></span> Salvando...';
-  try{
-    await api('POST','/api/auth/reset-password',{token:S.resetTok,password:p});
-    document.getElementById('rsform').innerHTML='';
-    ok.innerHTML='<div class="form-ok">✓ Senha alterada com sucesso!</div>';
-    setTimeout(()=>go('login'),2000);
-  }catch(ex){showErr(err,ex.message);btn.disabled=false;btn.innerHTML='Salvar Nova Senha';}
-}
+    async function doReset() {
+      const p = document.getElementById('rsp').value, p2 = document.getElementById('rsp2').value;
+      const err = document.getElementById('rserr'), ok = document.getElementById('rsok'); err.innerHTML = ''; ok.innerHTML = '';
+      if (!p || !p2) { showErr(err, 'Preencha os dois campos.'); return; }
+      if (p.length < 6) { showErr(err, 'A senha precisa ter no mínimo 6 caracteres.'); return; }
+      if (p !== p2) { showErr(err, 'As senhas não conferem.'); return; }
+      const btn = document.getElementById('reset-btn');
+      btn.disabled = true; btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px"></span> Salvando...';
+      try {
+        await api('POST', '/api/auth/reset-password', { token: S.resetTok, password: p });
+        document.getElementById('rsform').innerHTML = '';
+        ok.innerHTML = '<div class="form-ok">✓ Senha alterada com sucesso!</div>';
+        setTimeout(() => go('login'), 2000);
+      } catch (ex) { showErr(err, ex.message); btn.disabled = false; btn.innerHTML = 'Salvar Nova Senha'; }
+    }
 
-// ═══════════════════════════════════════════════════════════
-// TELAS DO JOGO — DASHBOARD
-// ═══════════════════════════════════════════════════════════
-function rDash(){
-  const u=S.user,rl=roleLabel(u.role,u.roleCustom),loc=[u.city,u.parish].filter(Boolean).join(' · ');
-  const trilha=S.trilha;
-  const temas=trilha?.temas||[];
-  const nStages=temas.length||10;
-  const dc=doneCount(),pct=Math.round(dc/nStages*100),ts=totalScore();
+    // ═══════════════════════════════════════════════════════════
+    // TELAS DO JOGO — DASHBOARD
+    // ═══════════════════════════════════════════════════════════
+    function rDash() {
+      const trilha = S.trilha;
+      const temas = trilha?.temas || [];
+      const nStages = temas.length || 10;
+      const dc = doneCount(), pct = Math.round(dc / nStages * 100), ts = totalScore();
 
-  // Seletor de trilhas (se houver mais de uma desbloqueada)
-  let trilhaSelector='';
-  if(S.trilhas.length>1){
-    let prevComplete=true;
-    trilhaSelector=`<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px">`;
-    S.trilhas.forEach((t,i)=>{
-      const isActive=t._id===trilha?._id;
-      const unlocked=i===0||prevComplete;
-      prevComplete=isTrilhaComplete(t,S.progress);
-      trilhaSelector+=`<button class="trilha-tab ${isActive?'active':''} ${!unlocked?'locked':''}"
-        ${unlocked?`onclick="selectTrilha('${t._id}')"`:'disabled'} title="${!unlocked?'Complete a trilha anterior para desbloquear':''}">
-        ${t.icon||'✝'} ${t.name}</button>`;
-    });
-    trilhaSelector+='</div>';
-  }
+      let trilhaSelector = '';
+      if (S.trilhas.length > 1) {
+        let prevComplete = true;
+        trilhaSelector = `<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px">`;
+        S.trilhas.forEach((t, i) => {
+          const isActive = t._id === trilha?._id;
+          const unlocked = i === 0 || prevComplete;
+          prevComplete = isTrilhaComplete(t, S.progress);
+          trilhaSelector += `<button class="trilha-tab ${isActive ? 'active' : ''} ${!unlocked ? 'locked' : ''}"
+        ${unlocked ? `onclick="selectTrilha('${t._id}')"` : 'disabled'} title="${!unlocked ? 'Complete a trilha anterior para desbloquear' : ''}">
+        ${t.icon || '✝'} ${t.name}</button>`;
+        });
+        trilhaSelector += '</div>';
+      }
 
-  let rows='';
-  for(let r=0;r<5;r++){const s1=r*2,s2=r*2+1;rows+=`<div class="sr">${tCard(s1,temas[s1],trilha)}${tCard(s2,temas[s2],trilha)}</div>`;}
+      let rows = '';
+      for (let r = 0; r < 5; r++) { const s1 = r * 2, s2 = r * 2 + 1; rows += `<div class="sr">${tCard(s1, temas[s1], trilha)}${tCard(s2, temas[s2], trilha)}</div>`; }
 
-  return`<div class="screen"><div class="dhdr"><div class="ctr">
+      return `<div class="screen"><div class="dhdr"><div class="ctr">
 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
-<div style="min-width:0"><span class="badge bw" style="font-size:10px;margin-bottom:5px">${rl}</span>
-<h1 class="serif" style="font-size:20px">${u.name}</h1>
-<p class="dim" style="font-size:12px;margin-top:1px">${loc}</p>
+<div style="min-width:0">
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+  <span class="logo-cross serif" style="font-size:22px;display:inline">✝</span>
+  <span class="serif gold" style="font-size:18px;font-weight:700;letter-spacing:.04em">DSA</span>
+  <span class="dim" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase">Desafio dos Servidores</span>
+</div>
 ${trilhaSelector}</div>
 <div style="text-align:right;flex-shrink:0">
-<p style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em">Pontuação Geral</p>
+<p style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em">Pontuação</p>
 <p class="gold serif" style="font-size:32px;font-weight:700;line-height:1">${ts}</p>
 <p class="dim" style="font-size:10px">pontos</p></div></div>
 <div style="margin-top:14px">
 <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--dim);margin-bottom:4px">
-<span>Trilha: <strong style="color:var(--ice)">${trilha?.name||'—'}</strong></span>
+<span>Trilha: <strong style="color:var(--ice)">${trilha?.name || '—'}</strong></span>
 <span>${dc}/${nStages}</span></div>
 <div class="pt"><div class="pf" style="width:${pct}%"></div></div></div>
 </div></div>
 <div class="ctr" style="padding-bottom:40px">
 <div style="display:flex;align-items:center;justify-content:space-between;margin:18px 0 5px">
 <h2 class="serif" style="font-size:17px">Temas da Trilha</h2>
-<div style="display:flex;gap:7px">
-<button class="btn btn-ghost btn-sm" onclick="go('ranking')">🏆 Ranking</button>
-<button class="btn btn-ghost btn-sm" onclick="logout()">Sair</button>
-</div></div>
+<button class="btn btn-ghost btn-sm" onclick="resetProgress()" title="Reiniciar progresso">↺ Recomeçar</button>
+</div>
 <p class="dim" style="font-size:12px;margin-bottom:2px">Complete cada tema com &gt;${PASS_THR}% de acertos de 1ª tentativa para avançar</p>
-<div class="sg">${rows}</div></div></div>`;}
+<div class="sg">${rows}</div>
+<div style="margin-top:24px;text-align:center">
+  <button onclick="goAdmin()" style="background:none;border:none;cursor:pointer;color:var(--dim2);font-size:11px;padding:6px 12px;opacity:.4">⚙</button>
+</div>
+</div></div>`;
+    }
 
-function tCard(i, tema, trilha){
-  if(!tema)return`<div style="flex:1"></div>`;
-  const p=getProgT(trilha._id,i),done=!!p.completed,prev=i===0||!!getProgT(trilha._id,i-1).completed;
-  const avail=prev&&!done,locked=!prev;
-  return`<div class="sc ${done?'done':avail?'avail':'locked'}" ${!locked?`onclick="startStage(${i})"`:''}>
-<div class="sc-ico">${locked?'🔒':done?'✅':tema.icon||'✝'}</div>
-<div class="sc-num">Etapa ${i+1}</div><div class="sc-ttl">${tema.name}</div>
-${done?`<div style="margin-top:6px"><span class="badge bo" style="font-size:10px">${p.score}pts</span>
+    function resetProgress() {
+      if (!confirm('Apagar todo o progresso e recomeçar do zero?\n\nIsso vai apagar todas as suas respostas, pontuações e etapas concluídas. Você vai começar tudo de novo do início.')) return;
+      localStorage.removeItem('dsa_progress');
+      S.progress = [];
+      render();
+    }
+
+    function goAdmin() {
+      S.screen = 'adminLogin'; render();
+    }
+
+    function tCard(i, tema, trilha) {
+      if (!tema) return `<div style="flex:1"></div>`;
+      const p = getProgT(trilha._id, i), done = !!p.completed, prev = i === 0 || !!getProgT(trilha._id, i - 1).completed;
+      const avail = prev && !done, locked = !prev;
+      return `<div class="sc ${done ? 'done' : avail ? 'avail' : 'locked'}" ${!locked ? `onclick="startStage(${i})"` : ''}>
+<div class="sc-ico">${locked ? '🔒' : done ? '✅' : tema.icon || '✝'}</div>
+<div class="sc-num">Etapa ${i + 1}</div><div class="sc-ttl">${tema.name}</div>
+${done ? `<div style="margin-top:6px"><span class="badge bo" style="font-size:10px">${p.score}pts</span>
 <span class="badge bw" style="font-size:10px;margin-left:3px">${Math.round(p.first_attempt_rate)}%</span></div>`
-:avail?`<div style="margin-top:6px"><span class="badge bw" style="font-size:10px">Disponível</span></div>`:''}
-</div>`;}
+          : avail ? `<div style="margin-top:6px"><span class="badge bw" style="font-size:10px">Disponível</span></div>` : ''}
+</div>`;
+    }
 
-function selectTrilha(id){
-  const t=S.trilhas.find(x=>x._id===id);
-  if(t){S.trilha=t;render();}
-}
+    function selectTrilha(id) {
+      const t = S.trilhas.find(x => x._id === id);
+      if (t) { S.trilha = t; render(); }
+    }
 
-// ═══════════════════════════════════════════════════════════
-// QUIZ
-// ═══════════════════════════════════════════════════════════
-function rQuiz(){
-  const q=S.quiz,tema=S.trilha?.temas?.[q.idx];
-  const pct=(q.ci/q.qs.length)*100;
-  return`<div class="screen"><div class="qhdr"><div class="ctr">
-<div class="qmeta"><span class="serif gold" style="font-size:13px">${tema?.name||'Quiz'}</span>
+    // ═══════════════════════════════════════════════════════════
+    // QUIZ
+    // ═══════════════════════════════════════════════════════════
+    function rQuiz() {
+      const q = S.quiz, tema = S.trilha?.temas?.[q.idx];
+      const pct = (q.ci / q.qs.length) * 100;
+      return `<div class="screen"><div class="qhdr"><div class="ctr">
+<div class="qmeta"><span class="serif gold" style="font-size:13px">${tema?.name || 'Quiz'}</span>
 <span id="qtimer" class="qtimer">${fmtTime(q.timer)}</span></div>
 <div style="display:flex;align-items:center;gap:11px">
 <div style="flex:1"><div class="pt"><div id="qprog" class="pf" style="width:${pct}%"></div></div></div>
-<span class="dim" style="font-size:12px;white-space:nowrap">${q.ci+1}/${q.qs.length}</span>
+<span class="dim" style="font-size:12px;white-space:nowrap">${q.ci + 1}/${q.qs.length}</span>
 <span id="qscore" class="qscore">${q.score} pts</span>
 </div></div></div>
-<div class="ctr" style="flex:1;padding-top:16px;padding-bottom:78px">
+<div class="ctr" style="flex:1;padding-top:16px;padding-bottom:calc(78px + env(safe-area-inset-bottom))">
 <div id="qinner">${qInner()}</div></div>
 <div class="skip-bar"><div style="width:100%;max-width:640px" id="skipwrap">
 <button class="btn btn-danger btn-full" onclick="doSkip()" style="font-size:13px">
 ⏭ Pular Questão &nbsp;<span style="opacity:.7">(-${SKIP_PEN} pts)</span></button>
-</div></div></div>`;}
+</div></div></div>`;
+    }
 
-// Remove referências bíblicas e citações entre parênteses das alternativas
-// para evitar que sirvam de dica (ex: "A parábola do filho pródigo (Lc 15,11-32)")
-function stripRef(text){
-  return text.replace(/\s*\([^)]*\d+[,:]\d[^)]*\)/g,'').trim();
-}
+    // Remove referências bíblicas e citações entre parênteses das alternativas
+    // para evitar que sirvam de dica (ex: "A parábola do filho pródigo (Lc 15,11-32)")
+    function stripRef(text) {
+      return text.replace(/\s*\([^)]*\d+[,:]\d[^)]*\)/g, '').trim();
+    }
 
-function qInner(){
-  const q=S.quiz,cur=q.qs[q.ci];
+    function qInner() {
+      const q = S.quiz, cur = q.qs[q.ci];
 
-  // Garante ordem embaralhada estável por questão (recalcula apenas quando muda de questão)
-  if(!q._shuffleMap || q._shuffleFor !== q.ci){
-    const map=[0,1,2,3];
-    for(let i=3;i>0;i--){const j=Math.floor(Math.random()*(i+1));[map[i],map[j]]=[map[j],map[i]];}
-    q._shuffleMap=map;   // map[displayPos] = originalIndex
-    q._reverseMap=map.reduce((r,orig,disp)=>{r[orig]=disp;return r},{});
-    q._shuffleFor=q.ci;
-  }
-  const map=q._shuffleMap, rev=q._reverseMap;
+      // Garante ordem embaralhada estável por questão (recalcula apenas quando muda de questão)
+      if (!q._shuffleMap || q._shuffleFor !== q.ci) {
+        const map = [0, 1, 2, 3];
+        for (let i = 3; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[map[i], map[j]] = [map[j], map[i]]; }
+        q._shuffleMap = map;   // map[displayPos] = originalIndex
+        q._reverseMap = map.reduce((r, orig, disp) => { r[orig] = disp; return r }, {});
+        q._shuffleFor = q.ci;
+      }
+      const map = q._shuffleMap, rev = q._reverseMap;
 
-  let opts='';
-  map.forEach((origIdx,dispIdx)=>{
-    const o=cur.opts[origIdx];
-    let cls='ans',dis='';
-    if(q.phase==='ok'){if(origIdx===cur.ans)cls+=' correct';else cls+=' dimmed';dis='disabled';}
-    else if(q.phase==='err'){if(origIdx===q.lastWrong)cls+=' wrong';dis='disabled';}
-    opts+=`<button class="${cls}" ${dis} onclick="pick(${origIdx})"><span class="ltr">${LETTERS[dispIdx]}</span><span>${stripRef(o)}</span></button>`;
-  });
-  let fb='';
-  if(q.phase==='err'){fb=`<div class="fb err">✗ &nbsp;Resposta incorreta! <strong>Tente novamente — vale ${q.val} pt${q.val!==1?'s':''}.</strong></div>`;}
-  else if(q.phase==='ok'){
-    const last=q.ci>=q.qs.length-1;
-    fb=`<div class="fb ok"><strong>✓ Correto! +${q.val} pt${q.val!==1?'s':''}!</strong>
+      let opts = '';
+      map.forEach((origIdx, dispIdx) => {
+        const o = cur.opts[origIdx];
+        let cls = 'ans', dis = '';
+        if (q.phase === 'ok') { if (origIdx === cur.ans) cls += ' correct'; else cls += ' dimmed'; dis = 'disabled'; }
+        else if (q.phase === 'err') { if (origIdx === q.lastWrong) cls += ' wrong'; dis = 'disabled'; }
+        opts += `<button class="${cls}" ${dis} onclick="pick(${origIdx})"><span class="ltr">${LETTERS[dispIdx]}</span><span>${stripRef(o)}</span></button>`;
+      });
+      let fb = '';
+      if (q.phase === 'err') { fb = `<div class="fb err">✗ &nbsp;Resposta incorreta! <strong>Tente novamente — vale ${q.val} pt${q.val !== 1 ? 's' : ''}.</strong></div>`; }
+      else if (q.phase === 'ok') {
+        const last = q.ci >= q.qs.length - 1;
+        fb = `<div class="fb ok"><strong>✓ Correto! +${q.val} pt${q.val !== 1 ? 's' : ''}!</strong>
 <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(74,222,128,.25);font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.75;color:#D1FAE5;letter-spacing:.01em">${cur.exp}</div></div>
-<div style="margin-top:13px"><button class="btn btn-gold btn-full" onclick="${last?'endStage()':'next()'}" style="font-size:15px;padding:13px">
-${last?'✝ Finalizar Etapa':'Próxima Questão →'}</button></div>`;}
-  return`<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:11px">
-<span class="badge bw">${cur.theme}</span><span class="qval">Vale ${q.val} pt${q.val!==1?'s':''}</span></div>
+<div style="margin-top:13px"><button class="btn btn-gold btn-full" onclick="${last ? 'endStage()' : 'next()'}" style="font-size:15px;padding:13px">
+${last ? '✝ Finalizar Etapa' : 'Próxima Questão →'}</button></div>`;
+      }
+      return `<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:11px">
+<span class="badge bw">${cur.theme}</span><span class="qval">Vale ${q.val} pt${q.val !== 1 ? 's' : ''}</span></div>
 <div class="card" style="margin-bottom:13px">
-<p class="dim" style="font-size:10px;margin-bottom:7px;text-transform:uppercase;letter-spacing:.06em">Questão ${q.ci+1}</p>
+<p class="dim" style="font-size:10px;margin-bottom:7px;text-transform:uppercase;letter-spacing:.06em">Questão ${q.ci + 1}</p>
 <p class="serif" style="font-size:16px;line-height:1.65">${cur.question}</p></div>
-${opts}${fb}`;}
+${opts}${fb}`;
+    }
 
-function doSkip(){
-  const q=S.quiz;if(q.phase==='ok')return;
-  const w=document.getElementById('skipwrap');if(!w||w.dataset.c)return;w.dataset.c='1';
-  w.innerHTML=`<div style="display:flex;gap:8px;align-items:center;background:rgba(140,21,21,.18);border:1px solid var(--err);border-radius:var(--rsm);padding:9px 12px">
+    function doSkip() {
+      const q = S.quiz; if (q.phase === 'ok') return;
+      const w = document.getElementById('skipwrap'); if (!w || w.dataset.c) return; w.dataset.c = '1';
+      w.innerHTML = `<div style="display:flex;gap:8px;align-items:center;background:rgba(140,21,21,.18);border:1px solid var(--err);border-radius:var(--rsm);padding:9px 12px">
 <span style="flex:1;font-size:12px;color:#F87171">Tem certeza? Custará ${SKIP_PEN} pontos!</span>
 <button class="btn btn-danger btn-sm" onclick="skip()">Pular</button>
-<button class="btn btn-ghost btn-sm" onclick="cancelSkip()">Cancelar</button></div>`;}
-function cancelSkip(){
-  const w=document.getElementById('skipwrap');if(!w)return;delete w.dataset.c;
-  w.innerHTML=`<button class="btn btn-danger btn-full" onclick="doSkip()" style="font-size:13px">⏭ Pular Questão &nbsp;<span style="opacity:.7">(-${SKIP_PEN} pts)</span></button>`;}
+<button class="btn btn-ghost btn-sm" onclick="cancelSkip()">Cancelar</button></div>`;
+    }
+    function cancelSkip() {
+      const w = document.getElementById('skipwrap'); if (!w) return; delete w.dataset.c;
+      w.innerHTML = `<button class="btn btn-danger btn-full" onclick="doSkip()" style="font-size:13px">⏭ Pular Questão &nbsp;<span style="opacity:.7">(-${SKIP_PEN} pts)</span></button>`;
+    }
 
-function rStageEnd(){
-  const r=S.result,far=Math.round(r.far);
-  const tema=S.trilha?.temas?.[r.idx];
-  const nextTema=S.trilha?.temas?.[r.idx+1];
-  const last=!nextTema;
-  const barClr=r.passed?'linear-gradient(90deg,var(--ok),var(--okl))':'var(--err)';
-  return`<div class="screen"><div class="ctr" style="padding-top:28px;padding-bottom:44px">
-<div style="text-align:center;margin-bottom:12px"><span class="badge ${r.passed?'bo':'be'}" style="font-size:13px;padding:5px 18px">${r.passed?'✓ APROVADO':'✗ REPROVADO'}</span></div>
-<div style="font-size:56px;text-align:center;margin:12px 0">${r.passed?'🏆':'📜'}</div>
-<h1 class="serif gold" style="font-size:21px;text-align:center;margin-bottom:7px">${tema?.name||'Etapa'}</h1>
+    function rStageEnd() {
+      const r = S.result, far = Math.round(r.far);
+      const tema = S.trilha?.temas?.[r.idx];
+      const nextTema = S.trilha?.temas?.[r.idx + 1];
+      const last = !nextTema;
+      const barClr = r.passed ? 'linear-gradient(90deg,var(--ok),var(--okl))' : 'var(--err)';
+      return `<div class="screen"><div class="ctr" style="padding-top:28px;padding-bottom:44px">
+<div style="text-align:center;margin-bottom:12px"><span class="badge ${r.passed ? 'bo' : 'be'}" style="font-size:13px;padding:5px 18px">${r.passed ? '✓ APROVADO' : '✗ REPROVADO'}</span></div>
+<div style="font-size:56px;text-align:center;margin:12px 0">${r.passed ? '🏆' : '📜'}</div>
+<h1 class="serif gold" style="font-size:21px;text-align:center;margin-bottom:7px">${tema?.name || 'Etapa'}</h1>
 <p class="dim" style="text-align:center;font-size:14px;margin-bottom:20px">
-${r.passed?(last?'Parabéns! Você completou todos os temas desta trilha!':'Excelente! Próximo tema desbloqueado.'):'Não desanime! Revise o conteúdo e tente novamente.'}</p>
+${r.passed ? (last ? 'Parabéns! Você completou todos os temas desta trilha!' : 'Excelente! Próximo tema desbloqueado.') : 'Não desanime! Revise o conteúdo e tente novamente.'}</p>
 <div class="stg">
 <div class="stb"><div class="stv">${r.score}</div><div class="stl">Pontos Ganhos</div></div>
 <div class="stb"><div class="stv">${fmtTime(r.time)}</div><div class="stl">Tempo Total</div></div>
@@ -913,33 +2014,33 @@ ${r.passed?(last?'Parabéns! Você completou todos os temas desta trilha!':'Exce
 </div>
 <div class="card" style="text-align:center;margin:4px 0 20px">
 <p class="dim" style="font-size:12px;margin-bottom:6px">Critério de aprovação — acertos na 1ª tentativa</p>
-<p style="font-size:14px">Taxa obtida: <strong class="${r.passed?'gold':''}">${far}%</strong> &nbsp;·&nbsp; Mínimo: <strong>${PASS_THR+1}%</strong></p>
-<div class="pt" style="margin-top:11px"><div class="pf" style="width:${Math.min(100,r.far)}%;background:${barClr}"></div></div></div>
+<p style="font-size:14px">Taxa obtida: <strong class="${r.passed ? 'gold' : ''}">${far}%</strong> &nbsp;·&nbsp; Mínimo: <strong>${PASS_THR + 1}%</strong></p>
+<div class="pt" style="margin-top:11px"><div class="pf" style="width:${Math.min(100, r.far)}%;background:${barClr}"></div></div></div>
 <div style="display:flex;flex-direction:column;gap:9px">
-${r.passed&&!last?`<button class="btn btn-gold btn-full" style="font-size:15px;padding:13px" onclick="startStage(${r.idx+1})">Próximo Tema: ${nextTema?.name||''} →</button>`:''}
-${!r.passed?`<button class="btn btn-wine btn-full" style="font-size:15px;padding:13px" onclick="startStage(${r.idx})">↺ Refazer Este Tema</button>`:''}
+${r.passed && !last ? `<button class="btn btn-gold btn-full" style="font-size:15px;padding:13px" onclick="startStage(${r.idx + 1})">Próximo Tema: ${nextTema?.name || ''} →</button>` : ''}
+${!r.passed ? `<button class="btn btn-wine btn-full" style="font-size:15px;padding:13px" onclick="startStage(${r.idx})">↺ Refazer Este Tema</button>` : ''}
 <button class="btn btn-ghost btn-full" onclick="go('dashboard')">Voltar ao Mapa de Temas</button>
-<button class="btn btn-ghost btn-full" onclick="go('ranking')">🏆 Ver Ranking</button>
-</div></div></div>`;}
+</div></div></div>`;
+    }
 
-function rRanking(){
-  const pos=i=>{if(i===0)return'🥇';if(i===1)return'🥈';if(i===2)return'🥉';return`#${i+1}`;};
-  const rows=S.rankData.map((u,i)=>{
-    const mine=S.user&&u.id===S.user.id,rl=roleLabel(u.role,u.role_custom),loc=[u.city,u.parish].filter(Boolean).join(' · ');
-    return`<div class="rkr" style="${mine?'background:rgba(200,168,75,.06);border-radius:8px;padding:13px 8px;margin:0 -8px':''}">
-<div class="rkp" style="${i<3?'font-size:22px':'color:var(--dim)'}">${pos(i)}</div>
+    function rRanking() {
+      const pos = i => { if (i === 0) return '🥇'; if (i === 1) return '🥈'; if (i === 2) return '🥉'; return `#${i + 1}`; };
+      const rows = S.rankData.map((u, i) => {
+        const mine = S.user && u.id === S.user.id, rl = roleLabel(u.role, u.role_custom), loc = [u.city, u.parish].filter(Boolean).join(' · ');
+        return `<div class="rkr" style="${mine ? 'background:rgba(200,168,75,.06);border-radius:8px;padding:13px 8px;margin:0 -8px' : ''}">
+<div class="rkp" style="${i < 3 ? 'font-size:22px' : 'color:var(--dim)'}">${pos(i)}</div>
 <div style="flex:1;min-width:0">
 <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
 <span style="font-weight:600;font-size:14px">${u.name}</span>
-${mine?'<span class="badge bg" style="font-size:10px">Você</span>':''}</div>
+${mine ? '<span class="badge bg" style="font-size:10px">Você</span>' : ''}</div>
 <div class="dim" style="font-size:11px;margin-top:2px">${rl} · ${loc}</div>
-<div class="dim" style="font-size:11px;margin-top:1px">${u.stages_done} tema${u.stages_done!==1?'s':''} concluído${u.stages_done!==1?'s':''}</div>
+<div class="dim" style="font-size:11px;margin-top:1px">${u.stages_done} tema${u.stages_done !== 1 ? 's' : ''} concluído${u.stages_done !== 1 ? 's' : ''}</div>
 </div>
 <div style="text-align:right;flex-shrink:0">
 <div class="gold serif" style="font-size:20px;font-weight:700">${u.total_score}</div>
 <div class="dim" style="font-size:11px">⏱ ${fmtTime(u.total_time)}</div></div></div>`;
-  }).join('');
-  return`<div class="screen">
+      }).join('');
+      return `<div class="screen">
 <div style="background:linear-gradient(180deg,rgba(115,24,40,.5) 0%,transparent 100%);padding:22px 0 16px;border-bottom:1px solid var(--bdr)">
 <div class="ctr"><div style="display:flex;align-items:center;gap:11px">
 <button class="btn btn-ghost btn-sm" onclick="go('dashboard')">← Voltar</button>
@@ -947,59 +2048,61 @@ ${mine?'<span class="badge bg" style="font-size:10px">Você</span>':''}</div>
 <p class="dim" style="font-size:11px;margin-top:2px">Maior pontuação · desempate pelo menor tempo</p></div>
 </div></div></div>
 <div class="ctr" style="padding-bottom:40px">
-${S.rankData.length?rows:'<p class="dim" style="text-align:center;padding:44px 0">Ainda não há participantes no ranking.</p>'}
-</div></div>`;}
+${S.rankData.length ? rows : '<p class="dim" style="text-align:center;padding:44px 0">Ainda não há participantes no ranking.</p>'}
+</div></div>`;
+    }
 
-// ═══════════════════════════════════════════════════════════
-// ADMIN — CARREGAMENTO
-// ═══════════════════════════════════════════════════════════
-async function admLoad(){
-  const [trilhas, temas, stats] = await Promise.all([
-    api('GET','/api/admin/trilhas'),
-    api('GET','/api/admin/temas'),
-    api('GET','/api/admin/stats')
-  ]);
-  S.adm.trilhas = trilhas;
-  S.adm.temas   = temas;
-  S.adm.stats   = stats;
-  if (!S.adm.selTema && temas.length) S.adm.selTema = temas[0]._id;
-  await admLoadQ();
-}
+    // ═══════════════════════════════════════════════════════════
+    // ADMIN — CARREGAMENTO
+    // ═══════════════════════════════════════════════════════════
+    async function admLoad() {
+      const [trilhas, temas, stats] = await Promise.all([
+        api('GET', '/api/admin/trilhas'),
+        api('GET', '/api/admin/temas'),
+        api('GET', '/api/admin/stats')
+      ]);
+      S.adm.trilhas = trilhas;
+      S.adm.temas = temas;
+      S.adm.stats = stats;
+      if (!S.adm.selTema && temas.length) S.adm.selTema = temas[0]._id;
+      await admLoadQ();
+    }
 
-async function admLoadQ(){
-  const a=S.adm;
-  const params=new URLSearchParams({temaId:a.selTema||'',page:a.page,limit:10});
-  const d=await api('GET','/api/admin/questions?'+params);
-  a.questions=d.rows;a.total=d.total;a.pages=d.pages;
-}
+    async function admLoadQ() {
+      const a = S.adm;
+      const params = new URLSearchParams({ temaId: a.selTema || '', page: a.page, limit: 10 });
+      const d = await api('GET', '/api/admin/questions?' + params);
+      a.questions = d.rows; a.total = d.total; a.pages = d.pages;
+    }
 
-// ═══════════════════════════════════════════════════════════
-// ADMIN — RENDER PRINCIPAL
-// ═══════════════════════════════════════════════════════════
-function rAdmin(){
-  const a=S.adm,tabs=[['questions','📋 Questões'],['trilhas','🗺 Trilhas'],['stats','📊 Estatísticas'],['study','📖 Material de Estudo']];
-  return`<div class="admin-layout">
+    // ═══════════════════════════════════════════════════════════
+    // ADMIN — RENDER PRINCIPAL
+    // ═══════════════════════════════════════════════════════════
+    function rAdmin() {
+      const a = S.adm, tabs = [['questions', '📋 Questões'], ['trilhas', '🗺 Trilhas'], ['stats', '📊 Estatísticas'], ['study', '📖 Material de Estudo']];
+      return `<div class="admin-layout">
 <nav class="admin-nav">
   <div class="admin-nav-logo">✝ DSA <span class="dim" style="font-size:11px;font-family:sans-serif"> Suporte</span></div>
-  ${tabs.map(([t,l])=>`<button class="nav-tab ${a.tab===t?'active':''}" onclick="admTab('${t}')">${l}</button>`).join('')}
+  ${tabs.map(([t, l]) => `<button class="nav-tab ${a.tab === t ? 'active' : ''}" onclick="admTab('${t}')">${l}</button>`).join('')}
   <div class="nav-spacer"></div>
   <span class="dim" style="font-size:12px;padding:0 8px;white-space:nowrap">${S.user?.name}</span>
   <button class="btn btn-ghost btn-sm" style="margin:8px 0" onclick="logout()">Sair</button>
 </nav>
 <div class="admin-body ctr-lg">
-${a.tab==='questions'?rAdmQ():a.tab==='trilhas'?rAdmTrilhas():a.tab==='study'?rAdmStudy():rAdmStats()}
-</div></div>`;}
+${a.tab === 'questions' ? rAdmQ() : a.tab === 'trilhas' ? rAdmTrilhas() : a.tab === 'study' ? rAdmStudy() : rAdmStats()}
+</div></div>`;
+    }
 
-async function admTab(tab){
-  S.adm.tab=tab;
-  if(tab==='questions'){showLoad();await admLoadQ();hideLoad();}
-  if(tab==='stats'){showLoad();S.adm.stats=await api('GET','/api/admin/stats');hideLoad();}
-  render();
-}
+    async function admTab(tab) {
+      S.adm.tab = tab;
+      if (tab === 'questions') { showLoad(); await admLoadQ(); hideLoad(); }
+      if (tab === 'stats') { showLoad(); S.adm.stats = await api('GET', '/api/admin/stats'); hideLoad(); }
+      render();
+    }
 
-// ─── TAB: MATERIAL DE ESTUDO ──────────────────────────────────
-function rAdmStudy(){
-  return`<div>
+    // ─── TAB: MATERIAL DE ESTUDO ──────────────────────────────────
+    function rAdmStudy() {
+      return `<div>
 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:6px">
   <div>
     <h2 class="serif" style="font-size:18px">Material de Estudo — Trilha 1</h2>
@@ -1717,27 +2820,28 @@ function rAdmStudy(){
 </div>
 
 </div><!-- /ms-wrap -->
-</div>`;}
+</div>`;
+    }
 
-// ─── TAB: QUESTÕES ────────────────────────────────────────────
-function rAdmQ(){
-  const a=S.adm;
-  const temaOpts=a.temas.map(t=>`<option value="${t._id}" ${t._id===a.selTema?'selected':''}>${t.icon||'✝'} ${t.name} (${t.questionCount||0} questões)</option>`).join('');
-  const curTema=a.temas.find(t=>t._id===a.selTema);
+    // ─── TAB: QUESTÕES ────────────────────────────────────────────
+    function rAdmQ() {
+      const a = S.adm;
+      const temaOpts = a.temas.map(t => `<option value="${t._id}" ${t._id === a.selTema ? 'selected' : ''}>${t.icon || '✝'} ${t.name} (${t.questionCount || 0} questões)</option>`).join('');
+      const curTema = a.temas.find(t => t._id === a.selTema);
 
-  const qRows=a.questions.map((q,i)=>`
+      const qRows = a.questions.map((q, i) => `
   <tr>
-    <td style="color:var(--dim);font-size:12px">${(a.page-1)*10+i+1}</td>
-    <td><span class="badge bw" style="font-size:10px">${q.theme||'—'}</span></td>
+    <td style="color:var(--dim);font-size:12px">${(a.page - 1) * 10 + i + 1}</td>
+    <td><span class="badge bw" style="font-size:10px">${q.theme || '—'}</span></td>
     <td class="td-q">${q.question}</td>
-    <td style="font-weight:700;color:var(--gold)">${LETTERS[q.answer]||'?'}</td>
+    <td style="font-weight:700;color:var(--gold)">${LETTERS[q.answer] || '?'}</td>
     <td class="td-actions">
       <button class="btn btn-ghost btn-icon" onclick="openEditQ('${q._id}')" title="Editar">✏️</button>
-      <button class="btn btn-danger btn-icon" onclick="confirmDelQ('${q._id}','${q.question.slice(0,30).replace(/'/g,'').replace(/"/g,'')}...')" title="Excluir">🗑</button>
+      <button class="btn btn-danger btn-icon" onclick="confirmDelQ('${q._id}','${q.question.slice(0, 30).replace(/'/g, '').replace(/"/g, '')}...')" title="Excluir">🗑</button>
     </td>
   </tr>`).join('');
 
-  return`<div>
+      return `<div>
 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">
   <h2 class="serif" style="font-size:18px">Banco de Questões</h2>
   <button class="btn btn-gold" onclick="openNewQ()">+ Adicionar Questão</button>
@@ -1752,65 +2856,66 @@ function rAdmQ(){
 
 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
   <p class="dim" style="font-size:13px">
-    Tema: <strong style="color:var(--ice)">${curTema?.icon||''} ${curTema?.name||'?'}</strong> &nbsp;·&nbsp;
-    <strong style="color:var(--gold)">${a.total}</strong> questão${a.total!==1?'s':''}
-    ${a.total>=10?'<span class="badge bo" style="font-size:10px;margin-left:6px">✓ Completo</span>':'<span class="badge bw" style="font-size:10px;margin-left:6px">⚠ Adicionar mais</span>'}
+    Tema: <strong style="color:var(--ice)">${curTema?.icon || ''} ${curTema?.name || '?'}</strong> &nbsp;·&nbsp;
+    <strong style="color:var(--gold)">${a.total}</strong> questão${a.total !== 1 ? 's' : ''}
+    ${a.total >= 10 ? '<span class="badge bo" style="font-size:10px;margin-left:6px">✓ Completo</span>' : '<span class="badge bw" style="font-size:10px;margin-left:6px">⚠ Adicionar mais</span>'}
   </p>
-  ${a.pages>1?`<div style="display:flex;gap:6px;align-items:center">
-    <button class="btn btn-ghost btn-sm" onclick="admPage(${a.page-1})" ${a.page<=1?'disabled':''}>◀</button>
+  ${a.pages > 1 ? `<div style="display:flex;gap:6px;align-items:center">
+    <button class="btn btn-ghost btn-sm" onclick="admPage(${a.page - 1})" ${a.page <= 1 ? 'disabled' : ''}>◀</button>
     <span class="dim" style="font-size:12px">Pág ${a.page}/${a.pages}</span>
-    <button class="btn btn-ghost btn-sm" onclick="admPage(${a.page+1})" ${a.page>=a.pages?'disabled':''}>▶</button>
-  </div>`:''}
+    <button class="btn btn-ghost btn-sm" onclick="admPage(${a.page + 1})" ${a.page >= a.pages ? 'disabled' : ''}>▶</button>
+  </div>`: ''}
 </div>
 
-${a.questions.length?`<div class="tbl-wrap"><table>
+${a.questions.length ? `<div class="tbl-wrap"><table>
 <thead><tr>
   <th style="width:40px">#</th><th style="width:120px">Subtema</th>
   <th>Enunciado</th><th style="width:60px">Gabarito</th><th style="width:90px">Ações</th>
 </tr></thead>
 <tbody>${qRows}</tbody>
-</table></div>`:`<div style="text-align:center;padding:40px 0;color:var(--dim)">
+</table></div>`: `<div style="text-align:center;padding:40px 0;color:var(--dim)">
 <p style="font-size:32px;margin-bottom:10px">📝</p>
 <p>Nenhuma questão encontrada neste tema.</p>
 <button class="btn btn-gold" style="margin-top:14px" onclick="openNewQ()">Adicionar a Primeira Questão</button>
 </div>`}
-</div>`;}
+</div>`;
+    }
 
-async function admSelTema(id){S.adm.selTema=id;S.adm.page=1;showLoad();await admLoadQ();hideLoad();render();}
-async function admPage(p){if(p<1||p>S.adm.pages)return;S.adm.page=p;showLoad();await admLoadQ();hideLoad();render();}
+    async function admSelTema(id) { S.adm.selTema = id; S.adm.page = 1; showLoad(); await admLoadQ(); hideLoad(); render(); }
+    async function admPage(p) { if (p < 1 || p > S.adm.pages) return; S.adm.page = p; showLoad(); await admLoadQ(); hideLoad(); render(); }
 
-// ─── TAB: TRILHAS ─────────────────────────────────────────────
-function rAdmTrilhas(){
-  const a=S.adm,stats=a.stats||{};
-  const cards=a.trilhas.map(trilha=>{
-    const total=stats.byTrilha?.[trilha._id]||0;
-    const temas=trilha.temas||[];
-    const temaRows=temas.map((t,i)=>{
-      const qCount=stats.byTema?.[t._id]||0;
-      return`<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bdr)">
-        <span style="font-size:18px;min-width:26px;text-align:center">${t.icon||'✝'}</span>
-        <span style="font-size:13px;color:var(--dim);min-width:22px;text-align:right">${i+1}.</span>
+    // ─── TAB: TRILHAS ─────────────────────────────────────────────
+    function rAdmTrilhas() {
+      const a = S.adm, stats = a.stats || {};
+      const cards = a.trilhas.map(trilha => {
+        const total = stats.byTrilha?.[trilha._id] || 0;
+        const temas = trilha.temas || [];
+        const temaRows = temas.map((t, i) => {
+          const qCount = stats.byTema?.[t._id] || 0;
+          return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bdr)">
+        <span style="font-size:18px;min-width:26px;text-align:center">${t.icon || '✝'}</span>
+        <span style="font-size:13px;color:var(--dim);min-width:22px;text-align:right">${i + 1}.</span>
         <span style="flex:1;font-size:14px;font-weight:500">${t.name}</span>
-        <span class="badge ${qCount>=10?'bo':'bw'}" style="font-size:10px">${qCount}q</span>
+        <span class="badge ${qCount >= 10 ? 'bo' : 'bw'}" style="font-size:10px">${qCount}q</span>
         <button style="background:none;border:none;cursor:pointer;color:var(--dim);font-size:13px;padding:2px 5px;border-radius:4px" onclick="openEditTema('${t._id}')" title="Editar tema">✏️</button>
       </div>`;
-    }).join('');
-    return`<div class="trilha-card">
+        }).join('');
+        return `<div class="trilha-card">
 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px">
 <div>
-<span style="font-size:26px">${trilha.icon||'✝'}</span>
+<span style="font-size:26px">${trilha.icon || '✝'}</span>
 <span class="badge bw" style="margin-left:8px;font-size:10px;vertical-align:middle">Trilha ${trilha.code}</span>
 <strong style="font-size:16px;margin-left:8px;vertical-align:middle">${trilha.name}</strong>
 </div>
 <div style="text-align:right;flex-shrink:0">
 <span style="font-size:13px;color:var(--gold);font-weight:700">${total} questões</span>
 </div></div>
-<p class="dim" style="font-size:12px;margin-bottom:12px">${trilha.desc||''}</p>
-<div>${temaRows||'<span class="dim" style="font-size:12px">Nenhum tema ainda.</span>'}</div>
+<p class="dim" style="font-size:12px;margin-bottom:12px">${trilha.desc || ''}</p>
+<div>${temaRows || '<span class="dim" style="font-size:12px">Nenhum tema ainda.</span>'}</div>
 </div>`;
-  }).join('');
+      }).join('');
 
-  return`<div>
+      return `<div>
 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">
   <div>
     <h2 class="serif" style="font-size:18px">Trilhas</h2>
@@ -1818,12 +2923,13 @@ function rAdmTrilhas(){
   </div>
   <button class="btn btn-gold" onclick="openNtModal()">+ Nova Trilha</button>
 </div>
-${cards||'<p class="dim" style="text-align:center;padding:40px 0">Nenhuma trilha cadastrada.</p>'}
-</div>`;}
+${cards || '<p class="dim" style="text-align:center;padding:40px 0">Nenhuma trilha cadastrada.</p>'}
+</div>`;
+    }
 
-// ─── TAB: ESTATÍSTICAS ────────────────────────────────────────
-function rAdmStudy(){
-  return`<div>
+    // ─── TAB: ESTATÍSTICAS ────────────────────────────────────────
+    function rAdmStudy() {
+      return `<div>
 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:6px">
   <div>
     <h2 class="serif" style="font-size:18px">📖 Material de Estudo — Trilha 1</h2>
@@ -1833,95 +2939,95 @@ function rAdmStudy(){
 </div>
 <div id="study-content" style="max-width:820px">
 
-${studyChapter('✝','1','Liturgia e Objetos Sagrados',[
-  ['O Altar', 'Mesa central da celebração eucarística. Deve ser de pedra natural (conforme a tradição) ou outro material sólido e digno. O altar fixo é consagrado pelo bispo com unção de Crisma. Simboliza Cristo — é Ele a pedra viva (1Pd 2,4).'],
-  ['Vasos Sagrados', '<strong>Cálice:</strong> contém o vinho que se torna o Sangue de Cristo. <strong>Píxide:</strong> guarda as hóstias consagradas no Sacrário. <strong>Patena:</strong> disco sobre o qual repousa a hóstia do celebrante. <strong>Ostensório (ou Custódia):</strong> expõe o Santíssimo para adoração. <strong>Âmbula:</strong> recipiente para distribuição da comunhão.'],
-  ['Vestes Litúrgicas', '<strong>Alba:</strong> veste branca, símbolo do Batismo. <strong>Estola:</strong> insígnia do ministério ordenado, usada ao pescoço. <strong>Casula:</strong> veste exterior do sacerdote na Missa. <strong>Dalmática:</strong> veste do diácono. <strong>Cíngulo:</strong> cordão que cinge a alba. <strong>Pluvial (Capa de Asperges):</strong> usada em procissões e bênçãos.'],
-  ['Incenso e Turíbulo', 'O <strong>turíbulo</strong> é o incensário suspenso por correntes. A <strong>naveta</strong> guarda o incenso. O ministro responsável é o <strong>turiferário</strong>. O incenso simboliza a oração que sobe a Deus (Sl 141,2) e a presença divina.'],
-  ['O Espaço Sagrado', '<strong>Nave:</strong> corpo principal da igreja, onde se reúnem os fiéis. <strong>Presbitério:</strong> espaço elevado onde fica o altar e o ambão. <strong>Ábside:</strong> parte semicircular ao fundo, onde fica o altar-mor. <strong>Nártex:</strong> vestíbulo de entrada, espaço dos catecúmenos na Igreja antiga. <strong>Sacrário (Tabernáculo):</strong> cofre onde se reserva o Santíssimo.'],
-  ['Ministros do Altar', '<strong>Acólito:</strong> ministro instituído que serve no altar. <strong>Coroinha (ou Servo do Altar):</strong> leigo que auxilia o sacerdote. <strong>Diácono:</strong> ministro ordenado que proclama o Evangelho, preside no altar e assiste o presbítero. <strong>Leitor:</strong> proclama as leituras bíblicas. <strong>Turiferário:</strong> porta o incensário. <strong>Cruzífero:</strong> porta a cruz na procissão.'],
-])}
+${studyChapter('✝', '1', 'Liturgia e Objetos Sagrados', [
+        ['O Altar', 'Mesa central da celebração eucarística. Deve ser de pedra natural (conforme a tradição) ou outro material sólido e digno. O altar fixo é consagrado pelo bispo com unção de Crisma. Simboliza Cristo — é Ele a pedra viva (1Pd 2,4).'],
+        ['Vasos Sagrados', '<strong>Cálice:</strong> contém o vinho que se torna o Sangue de Cristo. <strong>Píxide:</strong> guarda as hóstias consagradas no Sacrário. <strong>Patena:</strong> disco sobre o qual repousa a hóstia do celebrante. <strong>Ostensório (ou Custódia):</strong> expõe o Santíssimo para adoração. <strong>Âmbula:</strong> recipiente para distribuição da comunhão.'],
+        ['Vestes Litúrgicas', '<strong>Alba:</strong> veste branca, símbolo do Batismo. <strong>Estola:</strong> insígnia do ministério ordenado, usada ao pescoço. <strong>Casula:</strong> veste exterior do sacerdote na Missa. <strong>Dalmática:</strong> veste do diácono. <strong>Cíngulo:</strong> cordão que cinge a alba. <strong>Pluvial (Capa de Asperges):</strong> usada em procissões e bênçãos.'],
+        ['Incenso e Turíbulo', 'O <strong>turíbulo</strong> é o incensário suspenso por correntes. A <strong>naveta</strong> guarda o incenso. O ministro responsável é o <strong>turiferário</strong>. O incenso simboliza a oração que sobe a Deus (Sl 141,2) e a presença divina.'],
+        ['O Espaço Sagrado', '<strong>Nave:</strong> corpo principal da igreja, onde se reúnem os fiéis. <strong>Presbitério:</strong> espaço elevado onde fica o altar e o ambão. <strong>Ábside:</strong> parte semicircular ao fundo, onde fica o altar-mor. <strong>Nártex:</strong> vestíbulo de entrada, espaço dos catecúmenos na Igreja antiga. <strong>Sacrário (Tabernáculo):</strong> cofre onde se reserva o Santíssimo.'],
+        ['Ministros do Altar', '<strong>Acólito:</strong> ministro instituído que serve no altar. <strong>Coroinha (ou Servo do Altar):</strong> leigo que auxilia o sacerdote. <strong>Diácono:</strong> ministro ordenado que proclama o Evangelho, preside no altar e assiste o presbítero. <strong>Leitor:</strong> proclama as leituras bíblicas. <strong>Turiferário:</strong> porta o incensário. <strong>Cruzífero:</strong> porta a cruz na procissão.'],
+      ])}
 
-${studyChapter('📅','2','Tempos e Calendário Litúrgico',[
-  ['O Ano Litúrgico', 'A Igreja organiza a celebração do mistério de Cristo ao longo de um ciclo anual. Começa no <strong>1º Domingo do Advento</strong> (quatro domingos antes do Natal). O ciclo de leituras dominicais divide-se em três anos: <strong>A (Mateus), B (Marcos), C (Lucas)</strong>. João é lido em todos os anos, especialmente na Páscoa.'],
-  ['Advento', 'Quatro semanas de preparação para o Natal. Cor litúrgica: <strong>roxo (violeta)</strong>. O 3º domingo, chamado <em>Gaudete</em>, usa o rosa. Evoca a espera de Israel pelo Messias e a espera da Igreja pela volta de Cristo.'],
-  ['Natal e Tempo Natalino', 'Celebra o nascimento de Jesus, em <strong>25 de dezembro</strong> (documentado em Roma desde 336 d.C.). O Tempo Natalino vai até o <strong>Batismo do Senhor</strong> (1º domingo após 6 de janeiro). Cor: branca/dourada. Inclui: Sagrada Família, Solenidade de Maria (1/jan), Epifania (6/jan).'],
-  ['Quaresma', 'Quarenta dias de penitência e preparação para a Páscoa. Inicia na <strong>Quarta-feira de Cinzas</strong>. Cor: roxo. Não se canta Aleluia. Inclui a <strong>Semana Santa</strong>, que culmina no <em>Tríduo Pascal</em> (Quinta, Sexta e Sábado Santos + Vigília Pascal).'],
-  ['Páscoa e Tempo Pascal', 'A Páscoa é a festa mais importante do ano litúrgico — celebra a Ressurreição de Cristo. Cor: branca. O Tempo Pascal dura <strong>50 dias</strong>, até Pentecostes. Inclui: Ascensão do Senhor (40º dia) e encerra-se com Pentecostes (cor vermelha).'],
-  ['Tempo Comum', 'Trinta e três ou trinta e quatro semanas ao longo do ano, fora dos tempos fortes. Cor: <strong>verde</strong>, símbolo de esperança e crescimento. Encerra-se com a solenidade de <strong>Cristo Rei do Universo</strong> (último domingo).'],
-  ['Dias e Solenidades', '<strong>Solenidade:</strong> grau máximo (Natal, Páscoa, Pentecostes, Assunção, Todos os Santos). <strong>Festa:</strong> grau intermediário (Transfiguração, São João Batista). <strong>Memória:</strong> obrigatória ou facultativa (santos do calendário). <strong>Feria:</strong> dia sem celebração especial.'],
-])}
+${studyChapter('📅', '2', 'Tempos e Calendário Litúrgico', [
+        ['O Ano Litúrgico', 'A Igreja organiza a celebração do mistério de Cristo ao longo de um ciclo anual. Começa no <strong>1º Domingo do Advento</strong> (quatro domingos antes do Natal). O ciclo de leituras dominicais divide-se em três anos: <strong>A (Mateus), B (Marcos), C (Lucas)</strong>. João é lido em todos os anos, especialmente na Páscoa.'],
+        ['Advento', 'Quatro semanas de preparação para o Natal. Cor litúrgica: <strong>roxo (violeta)</strong>. O 3º domingo, chamado <em>Gaudete</em>, usa o rosa. Evoca a espera de Israel pelo Messias e a espera da Igreja pela volta de Cristo.'],
+        ['Natal e Tempo Natalino', 'Celebra o nascimento de Jesus, em <strong>25 de dezembro</strong> (documentado em Roma desde 336 d.C.). O Tempo Natalino vai até o <strong>Batismo do Senhor</strong> (1º domingo após 6 de janeiro). Cor: branca/dourada. Inclui: Sagrada Família, Solenidade de Maria (1/jan), Epifania (6/jan).'],
+        ['Quaresma', 'Quarenta dias de penitência e preparação para a Páscoa. Inicia na <strong>Quarta-feira de Cinzas</strong>. Cor: roxo. Não se canta Aleluia. Inclui a <strong>Semana Santa</strong>, que culmina no <em>Tríduo Pascal</em> (Quinta, Sexta e Sábado Santos + Vigília Pascal).'],
+        ['Páscoa e Tempo Pascal', 'A Páscoa é a festa mais importante do ano litúrgico — celebra a Ressurreição de Cristo. Cor: branca. O Tempo Pascal dura <strong>50 dias</strong>, até Pentecostes. Inclui: Ascensão do Senhor (40º dia) e encerra-se com Pentecostes (cor vermelha).'],
+        ['Tempo Comum', 'Trinta e três ou trinta e quatro semanas ao longo do ano, fora dos tempos fortes. Cor: <strong>verde</strong>, símbolo de esperança e crescimento. Encerra-se com a solenidade de <strong>Cristo Rei do Universo</strong> (último domingo).'],
+        ['Dias e Solenidades', '<strong>Solenidade:</strong> grau máximo (Natal, Páscoa, Pentecostes, Assunção, Todos os Santos). <strong>Festa:</strong> grau intermediário (Transfiguração, São João Batista). <strong>Memória:</strong> obrigatória ou facultativa (santos do calendário). <strong>Feria:</strong> dia sem celebração especial.'],
+      ])}
 
-${studyChapter('💧','3','Sacramentos e Sacramentais',[
-  ['O que são Sacramentos', 'Sinais eficazes da graça, instituídos por Cristo e confiados à Igreja, pelos quais a vida divina é comunicada aos fiéis (CIC 1131). São sete: Batismo, Confirmação/Crisma, Eucaristia, Penitência, Unção dos Enfermos, Ordem e Matrimônio.'],
-  ['Batismo', 'Porta de entrada para a vida cristã e para os outros sacramentos. Confere a graça original, incorpora ao Corpo de Cristo e imprime caráter indelével. Matéria: água. Forma: "Eu te batizo em nome do Pai, do Filho e do Espírito Santo." Ministro ordinário: padre ou diácono.'],
-  ['Crisma (Confirmação)', 'Confirma e fortalece a graça batismal. Confere os dons do Espírito Santo. Matéria: óleo do Crisma (myron). Forma: imposição das mãos + unção na testa. Ministro ordinário: bispo. Imprime caráter indelével.'],
-  ['Eucaristia', 'Fonte e ápice da vida cristã (LG 11). Na Consagração, o pão e o vinho se tornam verdadeiramente o Corpo e o Sangue de Cristo — <em>transubstanciação</em>. O celebrante pronuncia as palavras do Senhor sobre o pão ("Isto é o meu Corpo") e sobre o vinho ("Este é o cálice do meu Sangue").'],
-  ['Penitência e Reconciliação', 'Perdoa os pecados cometidos após o Batismo. A parábola do Filho Pródigo (Lc 15,11-32) é o ícone da misericórdia. Elementos: contrição, confissão oral, absolvição, satisfação. Só o sacerdote pode absolver. O sigilo sacramental é absoluto e inviolável.'],
-  ['Unção dos Enfermos', 'Antes chamado "Extrema Unção". Conforta os enfermos em perigo de morte, une seu sofrimento ao de Cristo e pode conceder o perdão dos pecados. Matéria: óleo dos enfermos. Forma: oração e unção nas mãos e na testa. Ministro: sacerdote ou bispo.'],
-  ['Ordem e Matrimônio', '<strong>Ordem:</strong> consagra bispos, presbíteros e diáconos. Grau supremo: episcopado. <strong>Matrimônio:</strong> aliança entre homem e mulher, reflete a união de Cristo com a Igreja. Os próprios cônjuges são ministros do sacramento. É indissolúvel e aberto à vida.'],
-  ['Sacramentais', 'Sinais sagrados instituídos pela Igreja (não por Cristo diretamente) que preparam para receber a graça. Ex: água benta, bênçãos, cinzas, palmas, rosário, escapulário, crucifixo. Diferem dos sacramentos por não conferir graça ex opere operato.'],
-])}
+${studyChapter('💧', '3', 'Sacramentos e Sacramentais', [
+        ['O que são Sacramentos', 'Sinais eficazes da graça, instituídos por Cristo e confiados à Igreja, pelos quais a vida divina é comunicada aos fiéis (CIC 1131). São sete: Batismo, Confirmação/Crisma, Eucaristia, Penitência, Unção dos Enfermos, Ordem e Matrimônio.'],
+        ['Batismo', 'Porta de entrada para a vida cristã e para os outros sacramentos. Confere a graça original, incorpora ao Corpo de Cristo e imprime caráter indelével. Matéria: água. Forma: "Eu te batizo em nome do Pai, do Filho e do Espírito Santo." Ministro ordinário: padre ou diácono.'],
+        ['Crisma (Confirmação)', 'Confirma e fortalece a graça batismal. Confere os dons do Espírito Santo. Matéria: óleo do Crisma (myron). Forma: imposição das mãos + unção na testa. Ministro ordinário: bispo. Imprime caráter indelével.'],
+        ['Eucaristia', 'Fonte e ápice da vida cristã (LG 11). Na Consagração, o pão e o vinho se tornam verdadeiramente o Corpo e o Sangue de Cristo — <em>transubstanciação</em>. O celebrante pronuncia as palavras do Senhor sobre o pão ("Isto é o meu Corpo") e sobre o vinho ("Este é o cálice do meu Sangue").'],
+        ['Penitência e Reconciliação', 'Perdoa os pecados cometidos após o Batismo. A parábola do Filho Pródigo (Lc 15,11-32) é o ícone da misericórdia. Elementos: contrição, confissão oral, absolvição, satisfação. Só o sacerdote pode absolver. O sigilo sacramental é absoluto e inviolável.'],
+        ['Unção dos Enfermos', 'Antes chamado "Extrema Unção". Conforta os enfermos em perigo de morte, une seu sofrimento ao de Cristo e pode conceder o perdão dos pecados. Matéria: óleo dos enfermos. Forma: oração e unção nas mãos e na testa. Ministro: sacerdote ou bispo.'],
+        ['Ordem e Matrimônio', '<strong>Ordem:</strong> consagra bispos, presbíteros e diáconos. Grau supremo: episcopado. <strong>Matrimônio:</strong> aliança entre homem e mulher, reflete a união de Cristo com a Igreja. Os próprios cônjuges são ministros do sacramento. É indissolúvel e aberto à vida.'],
+        ['Sacramentais', 'Sinais sagrados instituídos pela Igreja (não por Cristo diretamente) que preparam para receber a graça. Ex: água benta, bênçãos, cinzas, palmas, rosário, escapulário, crucifixo. Diferem dos sacramentos por não conferir graça ex opere operato.'],
+      ])}
 
-${studyChapter('📖','4','Doutrina e Dogmas',[
-  ['A Trindade Santíssima', 'Deus é uno em essência e trino em pessoas: Pai, Filho e Espírito Santo. Cada pessoa é distinta, mas todas são o único Deus. Não são três deuses (politeísmo) nem um Deus com três modos de aparecer (modalismo). Dogma definido nos Concílios de Niceia (325) e Constantinopla (381).'],
-  ['Encarnação e Cristologia', 'Jesus Cristo é verdadeiro Deus e verdadeiro homem — duas naturezas numa só pessoa (hypostasis). Definido no Concílio de Calcedônia (451). A Virgem Maria é <em>Theotókos</em> (Mãe de Deus), definido em Éfeso (431). Heresias: arianismo (nega a divindade), nestorianismo (duas pessoas), monofisismo (uma só natureza).'],
-  ['A Igreja e seus Atributos', 'A Igreja é Una, Santa, Católica e Apostólica (as Quatro Marcas). É ao mesmo tempo humana e divina. Fundada sobre Pedro (Mt 16,18). O magistério ordinário e universal do bispo de Roma é infalível em matéria de fé e moral quando fala <em>ex cathedra</em>.'],
-  ['Infalibilidade e Magistério', 'O Papa é infalível quando define solenemente um dogma <em>ex cathedra</em>. Os bispos em comunhão com o Papa também exercem o magistério infalível. O <em>Catecismo da Igreja Católica</em> (1992) é a síntese oficial da doutrina.'],
-  ['Escatologia', 'As últimas realidades: Morte, Juízo, Céu, Purgatório, Inferno. O <strong>Juízo Particular</strong> ocorre imediatamente após a morte de cada pessoa. O <strong>Juízo Final</strong> ocorre na Parusia (segunda vinda de Cristo). O Purgatório é estado de purificação, não de condenação. As indulgências ajudam as almas do purgatório.'],
-  ['Maria e a Mariologia', '<strong>Imaculada Conceição:</strong> Maria foi preservada do pecado original desde o primeiro instante de sua concepção (dogma de 1854, Pio IX). <strong>Assunção:</strong> ao fim de sua vida terrena, foi assunta em corpo e alma ao Céu (dogma de 1950, Pio XII). <strong>Perpétua Virgindade:</strong> antes, durante e após o parto. <strong>Mãe de Deus (Theotókos):</strong> definido em Éfeso, 431.'],
-])}
+${studyChapter('📖', '4', 'Doutrina e Dogmas', [
+        ['A Trindade Santíssima', 'Deus é uno em essência e trino em pessoas: Pai, Filho e Espírito Santo. Cada pessoa é distinta, mas todas são o único Deus. Não são três deuses (politeísmo) nem um Deus com três modos de aparecer (modalismo). Dogma definido nos Concílios de Niceia (325) e Constantinopla (381).'],
+        ['Encarnação e Cristologia', 'Jesus Cristo é verdadeiro Deus e verdadeiro homem — duas naturezas numa só pessoa (hypostasis). Definido no Concílio de Calcedônia (451). A Virgem Maria é <em>Theotókos</em> (Mãe de Deus), definido em Éfeso (431). Heresias: arianismo (nega a divindade), nestorianismo (duas pessoas), monofisismo (uma só natureza).'],
+        ['A Igreja e seus Atributos', 'A Igreja é Una, Santa, Católica e Apostólica (as Quatro Marcas). É ao mesmo tempo humana e divina. Fundada sobre Pedro (Mt 16,18). O magistério ordinário e universal do bispo de Roma é infalível em matéria de fé e moral quando fala <em>ex cathedra</em>.'],
+        ['Infalibilidade e Magistério', 'O Papa é infalível quando define solenemente um dogma <em>ex cathedra</em>. Os bispos em comunhão com o Papa também exercem o magistério infalível. O <em>Catecismo da Igreja Católica</em> (1992) é a síntese oficial da doutrina.'],
+        ['Escatologia', 'As últimas realidades: Morte, Juízo, Céu, Purgatório, Inferno. O <strong>Juízo Particular</strong> ocorre imediatamente após a morte de cada pessoa. O <strong>Juízo Final</strong> ocorre na Parusia (segunda vinda de Cristo). O Purgatório é estado de purificação, não de condenação. As indulgências ajudam as almas do purgatório.'],
+        ['Maria e a Mariologia', '<strong>Imaculada Conceição:</strong> Maria foi preservada do pecado original desde o primeiro instante de sua concepção (dogma de 1854, Pio IX). <strong>Assunção:</strong> ao fim de sua vida terrena, foi assunta em corpo e alma ao Céu (dogma de 1950, Pio XII). <strong>Perpétua Virgindade:</strong> antes, durante e após o parto. <strong>Mãe de Deus (Theotókos):</strong> definido em Éfeso, 431.'],
+      ])}
 
-${studyChapter('🌿','5','Vida dos Santos',[
-  ['O que é a Santidade', 'Todo batizado é chamado à santidade (LG 40). Os santos são aqueles que viveram heroicamente as virtudes cristãs e agora estão com Deus. A canonização é a declaração infalível do Papa de que uma pessoa está no Céu e pode ser venerada universalmente.'],
-  ['Processo de Canonização', '1. <strong>Servo de Deus</strong> — abertura do processo diocesano. 2. <strong>Venerável</strong> — reconhecimento das virtudes heroicas. 3. <strong>Beato</strong> — beatificação (exige 1 milagre, exceto mártires). 4. <strong>Santo</strong> — canonização (exige 2 milagres). Mártires têm processo simplificado.'],
-  ['Santos Padroeiros dos Servidores', '<strong>São Tarcísio:</strong> mártir do século III, protetor dos coroinhas e servidores do altar, morreu protegendo a Eucaristia. <strong>São João Berchmanns:</strong> jovem jesuíta belga, patrono dos acólitos, modelo de devoção litúrgica. <strong>Santo Estêvão:</strong> primeiro diácono e primeiro mártir da Igreja.'],
-  ['Doutores da Igreja', 'Títulos conferidos a santos de grande contribuição teológica. Exemplos: <strong>Santo Agostinho</strong> (graça e livre-arbítrio), <strong>São Tomás de Aquino</strong> (Doutor Angélico, Suma Teológica), <strong>Santa Teresa de Ávila</strong> (primeira mulher Doutora), <strong>São João da Cruz</strong> (mística), <strong>Santa Teresinha</strong> (pequena via).'],
-  ['Santos do Calendário Litúrgico', '<strong>1/jan:</strong> Maria Mãe de Deus. <strong>24/jun:</strong> Nascimento de São João Batista. <strong>29/jun:</strong> São Pedro e São Paulo. <strong>15/ago:</strong> Assunção de Nossa Senhora. <strong>1/nov:</strong> Todos os Santos. <strong>2/nov:</strong> Fiéis Defuntos. <strong>8/dez:</strong> Imaculada Conceição. <strong>25/dez:</strong> Natal do Senhor.'],
-])}
+${studyChapter('🌿', '5', 'Vida dos Santos', [
+        ['O que é a Santidade', 'Todo batizado é chamado à santidade (LG 40). Os santos são aqueles que viveram heroicamente as virtudes cristãs e agora estão com Deus. A canonização é a declaração infalível do Papa de que uma pessoa está no Céu e pode ser venerada universalmente.'],
+        ['Processo de Canonização', '1. <strong>Servo de Deus</strong> — abertura do processo diocesano. 2. <strong>Venerável</strong> — reconhecimento das virtudes heroicas. 3. <strong>Beato</strong> — beatificação (exige 1 milagre, exceto mártires). 4. <strong>Santo</strong> — canonização (exige 2 milagres). Mártires têm processo simplificado.'],
+        ['Santos Padroeiros dos Servidores', '<strong>São Tarcísio:</strong> mártir do século III, protetor dos coroinhas e servidores do altar, morreu protegendo a Eucaristia. <strong>São João Berchmanns:</strong> jovem jesuíta belga, patrono dos acólitos, modelo de devoção litúrgica. <strong>Santo Estêvão:</strong> primeiro diácono e primeiro mártir da Igreja.'],
+        ['Doutores da Igreja', 'Títulos conferidos a santos de grande contribuição teológica. Exemplos: <strong>Santo Agostinho</strong> (graça e livre-arbítrio), <strong>São Tomás de Aquino</strong> (Doutor Angélico, Suma Teológica), <strong>Santa Teresa de Ávila</strong> (primeira mulher Doutora), <strong>São João da Cruz</strong> (mística), <strong>Santa Teresinha</strong> (pequena via).'],
+        ['Santos do Calendário Litúrgico', '<strong>1/jan:</strong> Maria Mãe de Deus. <strong>24/jun:</strong> Nascimento de São João Batista. <strong>29/jun:</strong> São Pedro e São Paulo. <strong>15/ago:</strong> Assunção de Nossa Senhora. <strong>1/nov:</strong> Todos os Santos. <strong>2/nov:</strong> Fiéis Defuntos. <strong>8/dez:</strong> Imaculada Conceição. <strong>25/dez:</strong> Natal do Senhor.'],
+      ])}
 
-${studyChapter('📜','6','Sagradas Escrituras',[
-  ['Composição da Bíblia', 'A Bíblia Católica contém <strong>73 livros</strong> (46 no AT e 27 no NT). Os 7 livros deuterocanônicos do AT (Tobias, Judite, 1-2 Macabeus, Sabedoria, Eclesiástico/Sirácida, Baruc) são aceitos pela Igreja mas não pelos protestantes. O cânon foi definido nos Concílios de Hipona (393) e Cartago (397).'],
-  ['Inspiração e Inerrância', 'A Sagrada Escritura é inspirada pelo Espírito Santo: Deus é o autor principal, os hagiógrafos (autores humanos) são autores secundários. A Bíblia ensina sem erro a verdade necessária para a salvação (DV 11). A interpretação autêntica pertence ao Magistério da Igreja.'],
-  ['Divisão do Novo Testamento', '<strong>4 Evangelhos:</strong> Mateus, Marcos, Lucas (sinóticos) e João. <strong>Atos dos Apóstolos:</strong> história da Igreja primitiva (Lucas). <strong>14 Cartas de Paulo</strong> (inclusive Hebreus). <strong>7 Cartas Católicas:</strong> Tiago, 1-2 Pedro, 1-2-3 João, Judas. <strong>Apocalipse</strong> de João.'],
-  ['Proclamação na Liturgia', 'Na Missa: 1ª Leitura (AT ou Atos), Salmo Responsorial, 2ª Leitura (cartas, aos domingos), Evangelho. O <strong>Lecionário</strong> é o livro das leituras. O <strong>Evangeliário</strong> contém só os Evangelhos e recebe honras especiais (incenso, beijo, processão). O Evangelho é sempre proclamado pelo diácono ou pelo padre.'],
-  ['Hermenêutica Católica', 'A Bíblia deve ser interpretada: (1) no sentido pretendido pelo autor; (2) no contexto de toda a Escritura; (3) em conformidade com a Tradição viva da Igreja. Sentidos: <strong>literal</strong> (o que o texto diz) e <strong>espirituais</strong> (alegórico, moral/tropológico, anagógico).'],
-])}
+${studyChapter('📜', '6', 'Sagradas Escrituras', [
+        ['Composição da Bíblia', 'A Bíblia Católica contém <strong>73 livros</strong> (46 no AT e 27 no NT). Os 7 livros deuterocanônicos do AT (Tobias, Judite, 1-2 Macabeus, Sabedoria, Eclesiástico/Sirácida, Baruc) são aceitos pela Igreja mas não pelos protestantes. O cânon foi definido nos Concílios de Hipona (393) e Cartago (397).'],
+        ['Inspiração e Inerrância', 'A Sagrada Escritura é inspirada pelo Espírito Santo: Deus é o autor principal, os hagiógrafos (autores humanos) são autores secundários. A Bíblia ensina sem erro a verdade necessária para a salvação (DV 11). A interpretação autêntica pertence ao Magistério da Igreja.'],
+        ['Divisão do Novo Testamento', '<strong>4 Evangelhos:</strong> Mateus, Marcos, Lucas (sinóticos) e João. <strong>Atos dos Apóstolos:</strong> história da Igreja primitiva (Lucas). <strong>14 Cartas de Paulo</strong> (inclusive Hebreus). <strong>7 Cartas Católicas:</strong> Tiago, 1-2 Pedro, 1-2-3 João, Judas. <strong>Apocalipse</strong> de João.'],
+        ['Proclamação na Liturgia', 'Na Missa: 1ª Leitura (AT ou Atos), Salmo Responsorial, 2ª Leitura (cartas, aos domingos), Evangelho. O <strong>Lecionário</strong> é o livro das leituras. O <strong>Evangeliário</strong> contém só os Evangelhos e recebe honras especiais (incenso, beijo, processão). O Evangelho é sempre proclamado pelo diácono ou pelo padre.'],
+        ['Hermenêutica Católica', 'A Bíblia deve ser interpretada: (1) no sentido pretendido pelo autor; (2) no contexto de toda a Escritura; (3) em conformidade com a Tradição viva da Igreja. Sentidos: <strong>literal</strong> (o que o texto diz) e <strong>espirituais</strong> (alegórico, moral/tropológico, anagógico).'],
+      ])}
 
-${studyChapter('🏛','7','História da Igreja',[
-  ['Igreja Primitiva (I–III séc.)', 'Nascida em Pentecostes. Perseguições romanas: Nero (64 d.C.), Décio, Diocleciano. <strong>Édito de Milão</strong> (313): Constantino garante liberdade religiosa. Primeiro Concílio Ecumênico: <strong>Niceia</strong> (325) — condena o arianismo e formula o Credo.'],
-  ['Grandes Cismas', '<strong>Cisma do Oriente (1054):</strong> separação entre Roma e Constantinopla (Igreja Ortodoxa), causada por disputas sobre o <em>Filioque</em> e a primazia papal. <strong>Reforma Protestante (1517):</strong> Martinho Lutero — 95 Teses. Resposta católica: Concílio de Trento (1545–1563).'],
-  ['Concílios Ecumênicos', 'Reuniões de todos os bispos do mundo em comunhão com o Papa. Total: 21. Importantes: <strong>Niceia I</strong> (325), <strong>Calcedônia</strong> (451), <strong>Trento</strong> (1545–63), <strong>Vaticano I</strong> (1869–70 — infalibilidade papal), <strong>Vaticano II</strong> (1962–65 — reforma litúrgica, ecumenismo, colegialidade).'],
-  ['Vaticano II', 'Convocado por João XXIII, concluído por Paulo VI. Documentos principais: <strong>Sacrosanctum Concilium</strong> (Liturgia), <strong>Lumen Gentium</strong> (Igreja), <strong>Dei Verbum</strong> (Revelação), <strong>Gaudium et Spes</strong> (Igreja no mundo). Introduziu: Missa em língua vernácula, participação ativa dos fiéis, ecumenismo.'],
-  ['Papas Modernos', '<strong>Pio XII</strong> (1939–58): dogma da Assunção. <strong>João XXIII</strong> (1958–63): Vaticano II. <strong>Paulo VI</strong> (1963–78): Humanae Vitae. <strong>João Paulo II</strong> (1978–2005): Catecismo de 1992, viagens missionárias. <strong>Bento XVI</strong> (2005–13): renúncia. <strong>Francisco</strong> (2013–): Laudato Si\', Amoris Laetitia.'],
-])}
+${studyChapter('🏛', '7', 'História da Igreja', [
+        ['Igreja Primitiva (I–III séc.)', 'Nascida em Pentecostes. Perseguições romanas: Nero (64 d.C.), Décio, Diocleciano. <strong>Édito de Milão</strong> (313): Constantino garante liberdade religiosa. Primeiro Concílio Ecumênico: <strong>Niceia</strong> (325) — condena o arianismo e formula o Credo.'],
+        ['Grandes Cismas', '<strong>Cisma do Oriente (1054):</strong> separação entre Roma e Constantinopla (Igreja Ortodoxa), causada por disputas sobre o <em>Filioque</em> e a primazia papal. <strong>Reforma Protestante (1517):</strong> Martinho Lutero — 95 Teses. Resposta católica: Concílio de Trento (1545–1563).'],
+        ['Concílios Ecumênicos', 'Reuniões de todos os bispos do mundo em comunhão com o Papa. Total: 21. Importantes: <strong>Niceia I</strong> (325), <strong>Calcedônia</strong> (451), <strong>Trento</strong> (1545–63), <strong>Vaticano I</strong> (1869–70 — infalibilidade papal), <strong>Vaticano II</strong> (1962–65 — reforma litúrgica, ecumenismo, colegialidade).'],
+        ['Vaticano II', 'Convocado por João XXIII, concluído por Paulo VI. Documentos principais: <strong>Sacrosanctum Concilium</strong> (Liturgia), <strong>Lumen Gentium</strong> (Igreja), <strong>Dei Verbum</strong> (Revelação), <strong>Gaudium et Spes</strong> (Igreja no mundo). Introduziu: Missa em língua vernácula, participação ativa dos fiéis, ecumenismo.'],
+        ['Papas Modernos', '<strong>Pio XII</strong> (1939–58): dogma da Assunção. <strong>João XXIII</strong> (1958–63): Vaticano II. <strong>Paulo VI</strong> (1963–78): Humanae Vitae. <strong>João Paulo II</strong> (1978–2005): Catecismo de 1992, viagens missionárias. <strong>Bento XVI</strong> (2005–13): renúncia. <strong>Francisco</strong> (2013–): Laudato Si\', Amoris Laetitia.'],
+      ])}
 
-${studyChapter('🎨','8','Arte e Simbolismo Sacro',[
-  ['Iconografia Cristã', 'A arte sacra comunica a fé. O <strong>Pantocrator</strong> (Cristo Todo-Poderoso) é a representação mais antiga de Cristo glorificado. O <strong>Icone</strong> não é apenas arte — é teologia em imagem; o olhar frontal convida à contemplação. A veneração das imagens remonta ao séc. II.'],
-  ['Símbolos de Cristo', '<strong>Chi-Rho (☧):</strong> monograma de Cristo (Χριστός). <strong>INRI:</strong> "Iesus Nazarenus Rex Iudaeorum". <strong>Peixe (ΙΧΘΥΣ):</strong> "Jesus Cristo Filho de Deus Salvador" em grego — sinal secreto dos primeiros cristãos. <strong>Alfa e Ômega (Α-Ω):</strong> "Eu sou o Primeiro e o Último" (Ap 1,8). <strong>Cordeiro:</strong> "Eis o Cordeiro de Deus" (Jo 1,29).'],
-  ['Cores Litúrgicas e Simbolismo', '<strong>Branco/Dourado:</strong> pureza, alegria — Natal, Páscoa, festas de Nossa Senhora e santos não mártires. <strong>Vermelho:</strong> Sangue de Cristo e fogo do Espírito — Domingo de Ramos, Sexta Santa, Pentecostes, festas de mártires e apóstolos. <strong>Verde:</strong> esperança — Tempo Comum. <strong>Roxo:</strong> penitência — Advento e Quaresma. <strong>Rosa:</strong> alegria moderada — Gaudete (3º Advento) e Laetare (4ª Quaresma).'],
-  ['Arquitetura das Igrejas', 'A planta cruciforme simboliza a Cruz de Cristo. A orientação para o leste (<em>ad orientem</em>) aponta para a luz de Cristo. O <strong>Vitral</strong> filtra a luz divina. O <strong>Campanário</strong> chama os fiéis e anuncia o louvor a Deus. A <strong>Cripta</strong> é a parte subterrânea, frequentemente local de sepultura de santos.'],
-  ['Música Sacra', 'O <strong>Canto Gregoriano</strong> é o canto próprio da liturgia romana (SC 116). O <strong>Órgão de Tubos</strong> é o instrumento por excelência da Igreja latina. A <strong>Polifonia</strong> clássica (Palestrina, Victoria) é aprovada pelo Concílio de Trento. A música sacra deve ter santidade, beleza de forma e universalidade (SC 4).'],
-])}
+${studyChapter('🎨', '8', 'Arte e Simbolismo Sacro', [
+        ['Iconografia Cristã', 'A arte sacra comunica a fé. O <strong>Pantocrator</strong> (Cristo Todo-Poderoso) é a representação mais antiga de Cristo glorificado. O <strong>Icone</strong> não é apenas arte — é teologia em imagem; o olhar frontal convida à contemplação. A veneração das imagens remonta ao séc. II.'],
+        ['Símbolos de Cristo', '<strong>Chi-Rho (☧):</strong> monograma de Cristo (Χριστός). <strong>INRI:</strong> "Iesus Nazarenus Rex Iudaeorum". <strong>Peixe (ΙΧΘΥΣ):</strong> "Jesus Cristo Filho de Deus Salvador" em grego — sinal secreto dos primeiros cristãos. <strong>Alfa e Ômega (Α-Ω):</strong> "Eu sou o Primeiro e o Último" (Ap 1,8). <strong>Cordeiro:</strong> "Eis o Cordeiro de Deus" (Jo 1,29).'],
+        ['Cores Litúrgicas e Simbolismo', '<strong>Branco/Dourado:</strong> pureza, alegria — Natal, Páscoa, festas de Nossa Senhora e santos não mártires. <strong>Vermelho:</strong> Sangue de Cristo e fogo do Espírito — Domingo de Ramos, Sexta Santa, Pentecostes, festas de mártires e apóstolos. <strong>Verde:</strong> esperança — Tempo Comum. <strong>Roxo:</strong> penitência — Advento e Quaresma. <strong>Rosa:</strong> alegria moderada — Gaudete (3º Advento) e Laetare (4ª Quaresma).'],
+        ['Arquitetura das Igrejas', 'A planta cruciforme simboliza a Cruz de Cristo. A orientação para o leste (<em>ad orientem</em>) aponta para a luz de Cristo. O <strong>Vitral</strong> filtra a luz divina. O <strong>Campanário</strong> chama os fiéis e anuncia o louvor a Deus. A <strong>Cripta</strong> é a parte subterrânea, frequentemente local de sepultura de santos.'],
+        ['Música Sacra', 'O <strong>Canto Gregoriano</strong> é o canto próprio da liturgia romana (SC 116). O <strong>Órgão de Tubos</strong> é o instrumento por excelência da Igreja latina. A <strong>Polifonia</strong> clássica (Palestrina, Victoria) é aprovada pelo Concílio de Trento. A música sacra deve ter santidade, beleza de forma e universalidade (SC 4).'],
+      ])}
 
-${studyChapter('🙏','9','Oração e Espiritualidade',[
-  ['O que é a Oração', '"A oração é a elevação da alma a Deus ou a súplica a Deus dos bens convenientes" (CIC 2590). Formas: <strong>bênção, adoração, petição, intercessão, ação de graças e louvor</strong>. A oração pressupõe fé, humildade e perseverança.'],
-  ['O Pai-Nosso', 'Oração ensinada por Jesus (Mt 6,9-13; Lc 11,2-4). Chamada de "oração dominical" ou "resumo de todo o Evangelho" (Tertuliano). Sete pedidos: santificação do nome, vinda do Reino, cumprimento da vontade, pão quotidiano, perdão, livramento da tentação, livramento do mal.'],
-  ['O Rosário', 'Oração mariana meditativa. Composto de 20 mistérios (desde João Paulo II): <strong>Gozosos, Luminosos, Dolorosos e Gloriosos</strong>. Cada dezena: 1 Pai-Nosso + 10 Ave-Marias + 1 Glória. Recomendado especialmente em outubro (Mês do Rosário) e dia 7 de outubro (Nossa Senhora do Rosário).'],
-  ['Liturgia das Horas', 'Oração oficial da Igreja — "santifica as horas do dia". Horas: <strong>Ofício de Leituras, Laudes (manhã), Hora Intermédia, Vésperas (tarde/noite), Completas (antes de dormir)</strong>. O <em>Breviário</em> é o livro que a contém. Obrigatória para clérigos e religiosos; recomendada para todos.'],
-  ['Lectio Divina', 'Método de leitura orante da Sagrada Escritura. Quatro etapas: <strong>Lectio</strong> (leitura atenta), <strong>Meditatio</strong> (reflexão), <strong>Oratio</strong> (oração pessoal), <strong>Contemplatio</strong> (silêncio contemplativo). Tradição monástica desde Orígenes; relançada pelo Vaticano II.'],
-  ['Vida Espiritual', 'A espiritualidade cristã tem três estágios clássicos: <strong>Via Purgativa</strong> (purificação do pecado), <strong>Via Iluminativa</strong> (crescimento na virtude e conhecimento de Deus), <strong>Via Unitiva</strong> (união transformante com Deus — própria dos místicos). A <em>oração de quietude</em> de Santa Teresa de Ávila pertence a esta última.'],
-])}
+${studyChapter('🙏', '9', 'Oração e Espiritualidade', [
+        ['O que é a Oração', '"A oração é a elevação da alma a Deus ou a súplica a Deus dos bens convenientes" (CIC 2590). Formas: <strong>bênção, adoração, petição, intercessão, ação de graças e louvor</strong>. A oração pressupõe fé, humildade e perseverança.'],
+        ['O Pai-Nosso', 'Oração ensinada por Jesus (Mt 6,9-13; Lc 11,2-4). Chamada de "oração dominical" ou "resumo de todo o Evangelho" (Tertuliano). Sete pedidos: santificação do nome, vinda do Reino, cumprimento da vontade, pão quotidiano, perdão, livramento da tentação, livramento do mal.'],
+        ['O Rosário', 'Oração mariana meditativa. Composto de 20 mistérios (desde João Paulo II): <strong>Gozosos, Luminosos, Dolorosos e Gloriosos</strong>. Cada dezena: 1 Pai-Nosso + 10 Ave-Marias + 1 Glória. Recomendado especialmente em outubro (Mês do Rosário) e dia 7 de outubro (Nossa Senhora do Rosário).'],
+        ['Liturgia das Horas', 'Oração oficial da Igreja — "santifica as horas do dia". Horas: <strong>Ofício de Leituras, Laudes (manhã), Hora Intermédia, Vésperas (tarde/noite), Completas (antes de dormir)</strong>. O <em>Breviário</em> é o livro que a contém. Obrigatória para clérigos e religiosos; recomendada para todos.'],
+        ['Lectio Divina', 'Método de leitura orante da Sagrada Escritura. Quatro etapas: <strong>Lectio</strong> (leitura atenta), <strong>Meditatio</strong> (reflexão), <strong>Oratio</strong> (oração pessoal), <strong>Contemplatio</strong> (silêncio contemplativo). Tradição monástica desde Orígenes; relançada pelo Vaticano II.'],
+        ['Vida Espiritual', 'A espiritualidade cristã tem três estágios clássicos: <strong>Via Purgativa</strong> (purificação do pecado), <strong>Via Iluminativa</strong> (crescimento na virtude e conhecimento de Deus), <strong>Via Unitiva</strong> (união transformante com Deus — própria dos místicos). A <em>oração de quietude</em> de Santa Teresa de Ávila pertence a esta última.'],
+      ])}
 
-${studyChapter('⚖','10','Moral e Ética Cristã',[
-  ['Fundamentos da Moral Cristã', 'A moral cristã não é apenas obrigação, mas resposta ao amor de Deus revelado em Cristo. "Sede perfeitos como o vosso Pai celestial é perfeito" (Mt 5,48). A lei moral natural (inscrita no coração humano), a lei divina revelada (Escritura e Tradição) e o magistério formam a base ética.'],
-  ['Consciência Moral', 'A consciência é o "núcleo secreto e o sacrário do homem" (GS 16). Deve ser formada — pelo Magistério, pela Escritura, pela oração e pelos sacramentos. Tipos: reta (conforme a verdade), errônea (enganada), laxa (subtrai importância ao pecado), escrupulosa (exagera o pecado).'],
-  ['Virtudes e Vícios', '<strong>Virtudes Cardeais:</strong> Prudência, Justiça, Fortaleza, Temperança. <strong>Virtudes Teologais:</strong> Fé, Esperança, Caridade. <strong>Sete Dons do Espírito Santo:</strong> Sabedoria, Entendimento, Conselho, Fortaleza, Ciência, Piedade, Temor de Deus. <strong>Sete Pecados Capitais:</strong> Soberba, Avareza, Luxúria, Ira, Gula, Inveja, Preguiça.'],
-  ['O Decálogo', 'Os Dez Mandamentos dados a Moisés (Ex 20,1-17; Dt 5,6-21): 1º Amar a Deus sobre tudo. 2º Não usar o nome de Deus em vão. 3º Guardar o domingo. 4º Honrar pai e mãe. 5º Não matar. 6º Não adulterar. 7º Não furtar. 8º Não mentir. 9º Não cobiçar a mulher do próximo. 10º Não cobiçar os bens alheios.'],
-  ['Moral Sexual e Familiar', 'A sexualidade humana é dom de Deus, ordenada ao amor conjugal e à procriação. <em>Humanae Vitae</em> (Paulo VI, 1968): reafirma a inseparabilidade entre dimensão unitiva e procriativa. A Igreja defende a família como "célula básica da sociedade" e se opõe ao aborto, à eutanásia e à manipulação genética.'],
-  ['Doutrina Social da Igreja (DSI)', 'Princípios: <strong>Dignidade da pessoa humana</strong> (fundamento), <strong>Bem Comum</strong>, <strong>Subsidiariedade</strong> (o Estado não substitui a família e grupos menores), <strong>Solidariedade</strong>, <strong>Destino Universal dos Bens</strong>, <strong>Opção Preferencial pelos Pobres</strong>. Documentos: Rerum Novarum (Leão XIII, 1891), Laudato Si\' (Francisco, 2015).'],
-  ['Bioética Cristã', 'A vida humana é sagrada desde a concepção até a morte natural. A Igreja condena: aborto (desde a concepção), eutanásia ativa, clonagem humana, fecundação in vitro (descarte de embriões). Aprova: tratamentos paliativos, doação de órgãos com consentimento, pesquisa respeitosa da dignidade humana.'],
-])}
+${studyChapter('⚖', '10', 'Moral e Ética Cristã', [
+        ['Fundamentos da Moral Cristã', 'A moral cristã não é apenas obrigação, mas resposta ao amor de Deus revelado em Cristo. "Sede perfeitos como o vosso Pai celestial é perfeito" (Mt 5,48). A lei moral natural (inscrita no coração humano), a lei divina revelada (Escritura e Tradição) e o magistério formam a base ética.'],
+        ['Consciência Moral', 'A consciência é o "núcleo secreto e o sacrário do homem" (GS 16). Deve ser formada — pelo Magistério, pela Escritura, pela oração e pelos sacramentos. Tipos: reta (conforme a verdade), errônea (enganada), laxa (subtrai importância ao pecado), escrupulosa (exagera o pecado).'],
+        ['Virtudes e Vícios', '<strong>Virtudes Cardeais:</strong> Prudência, Justiça, Fortaleza, Temperança. <strong>Virtudes Teologais:</strong> Fé, Esperança, Caridade. <strong>Sete Dons do Espírito Santo:</strong> Sabedoria, Entendimento, Conselho, Fortaleza, Ciência, Piedade, Temor de Deus. <strong>Sete Pecados Capitais:</strong> Soberba, Avareza, Luxúria, Ira, Gula, Inveja, Preguiça.'],
+        ['O Decálogo', 'Os Dez Mandamentos dados a Moisés (Ex 20,1-17; Dt 5,6-21): 1º Amar a Deus sobre tudo. 2º Não usar o nome de Deus em vão. 3º Guardar o domingo. 4º Honrar pai e mãe. 5º Não matar. 6º Não adulterar. 7º Não furtar. 8º Não mentir. 9º Não cobiçar a mulher do próximo. 10º Não cobiçar os bens alheios.'],
+        ['Moral Sexual e Familiar', 'A sexualidade humana é dom de Deus, ordenada ao amor conjugal e à procriação. <em>Humanae Vitae</em> (Paulo VI, 1968): reafirma a inseparabilidade entre dimensão unitiva e procriativa. A Igreja defende a família como "célula básica da sociedade" e se opõe ao aborto, à eutanásia e à manipulação genética.'],
+        ['Doutrina Social da Igreja (DSI)', 'Princípios: <strong>Dignidade da pessoa humana</strong> (fundamento), <strong>Bem Comum</strong>, <strong>Subsidiariedade</strong> (o Estado não substitui a família e grupos menores), <strong>Solidariedade</strong>, <strong>Destino Universal dos Bens</strong>, <strong>Opção Preferencial pelos Pobres</strong>. Documentos: Rerum Novarum (Leão XIII, 1891), Laudato Si\' (Francisco, 2015).'],
+        ['Bioética Cristã', 'A vida humana é sagrada desde a concepção até a morte natural. A Igreja condena: aborto (desde a concepção), eutanásia ativa, clonagem humana, fecundação in vitro (descarte de embriões). Aprova: tratamentos paliativos, doação de órgãos com consentimento, pesquisa respeitosa da dignidade humana.'],
+      ])}
 
 </div>
 
@@ -1938,15 +3044,15 @@ ${studyChapter('⚖','10','Moral e Ética Cristã',[
 }
 </style>
 </div>`;
-}
+    }
 
-function studyChapter(icon,num,title,topics){
-  const rows=topics.map(([t,c])=>`
+    function studyChapter(icon, num, title, topics) {
+      const rows = topics.map(([t, c]) => `
   <div class="study-topic" style="padding:13px 0;border-bottom:1px solid var(--bdr)">
     <p class="study-topic-title" style="font-size:12px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px">${t}</p>
     <p style="font-size:14px;line-height:1.8;color:var(--ice)">${c}</p>
   </div>`).join('');
-  return`<div class="study-ch" style="background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);margin-bottom:20px;overflow:hidden">
+      return `<div class="study-ch" style="background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);margin-bottom:20px;overflow:hidden">
 <div class="study-ch-hdr" style="background:linear-gradient(135deg,rgba(115,24,40,.6),rgba(45,24,64,.8));padding:16px 20px;display:flex;align-items:center;gap:12px">
   <span style="font-size:28px">${icon}</span>
   <div>
@@ -1956,33 +3062,69 @@ function studyChapter(icon,num,title,topics){
 </div>
 <div style="padding:4px 20px 10px">${rows}</div>
 </div>`;
-}
+    }
 
-function rAdmStats(){
-  const a=S.adm,stats=a.stats||{byTema:{},byTrilha:{},total:0};
-  const rows=a.temas.map(t=>{
-    const count=stats.byTema?.[t._id]||0;
-    const pct=Math.round(Math.min(100,count/10*100));
-    return`<tr>
-<td><span style="font-size:18px">${t.icon||'✝'}</span></td>
+    // ─── LOGIN DO ADMINISTRADOR (apenas suporte) ──────────────────
+    function rAdminLogin() {
+      return `<div class="screen" style="justify-content:center;align-items:center;padding:20px;background:radial-gradient(ellipse at top,rgba(115,24,40,.2) 0%,transparent 60%)">
+<div class="ctr-sm">
+<div class="logo-wrap"><span class="logo-cross serif">✝</span>
+<h1 class="serif gold" style="font-size:20px;margin-bottom:4px">Painel de Suporte</h1>
+<p class="dim" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase">Acesso Restrito</p></div>
+<div class="card">
+<div id="alerr"></div>
+<div class="fg"><label class="fl">E-mail</label><input class="fi" id="al-e" type="email" placeholder="E-mail do suporte" autocomplete="email"></div>
+<div class="fg"><label class="fl">Senha</label>
+<div class="pw-wrap"><input class="fi" id="al-p" type="password" placeholder="Senha" autocomplete="current-password">
+<button class="pw-eye" onclick="togglePwd('al-p')" type="button">👁</button></div></div>
+<button class="btn btn-gold btn-full" id="al-btn" onclick="doAdminLogin()" style="font-size:15px;padding:13px">Entrar</button>
+</div>
+<div style="text-align:center;margin-top:16px">
+<button class="btn-link" onclick="S.screen='dashboard';render()">← Voltar ao Desafio</button>
+</div></div></div>`;
+    }
+
+    async function doAdminLogin() {
+      const e = document.getElementById('al-e').value.trim(), p = document.getElementById('al-p').value;
+      const err = document.getElementById('alerr'); err.innerHTML = '';
+      if (!e || !p) { showErr(err, 'Preencha e-mail e senha.'); return; }
+      const btn = document.getElementById('al-btn');
+      btn.disabled = true; btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px"></span> Entrando...';
+      try {
+        const d = await api('POST', '/api/auth/login', { email: e, password: p });
+        if (d.user.role !== 'support') { showErr(err, 'Acesso restrito ao perfil de suporte.'); return; }
+        setAuth(d.token, d.user);
+        showLoad(); await admLoad(); hideLoad();
+        S.screen = 'admin'; render();
+      } catch (ex) { showErr(err, ex.message); }
+      finally { btn.disabled = false; btn.innerHTML = 'Entrar'; }
+    }
+
+    function rAdmStats() {
+      const a = S.adm, stats = a.stats || { byTema: {}, byTrilha: {}, total: 0 };
+      const rows = a.temas.map(t => {
+        const count = stats.byTema?.[t._id] || 0;
+        const pct = Math.round(Math.min(100, count / 10 * 100));
+        return `<tr>
+<td><span style="font-size:18px">${t.icon || '✝'}</span></td>
 <td><strong>${t.name}</strong></td>
 <td style="text-align:center;font-weight:700;color:var(--gold)">${count}</td>
-<td style="text-align:center"><span class="badge ${count>=10?'bo':count>0?'bw':'be'}" style="font-size:10px">${count>=10?'✓ OK':count>0?`${count}/10`:'Vazio'}</span></td>
+<td style="text-align:center"><span class="badge ${count >= 10 ? 'bo' : count > 0 ? 'bw' : 'be'}" style="font-size:10px">${count >= 10 ? '✓ OK' : count > 0 ? `${count}/10` : 'Vazio'}</span></td>
 <td style="min-width:140px">
 <div style="display:flex;align-items:center;gap:8px">
 <div class="pt" style="flex:1"><div class="pf" style="width:${pct}%"></div></div>
 <span class="dim" style="font-size:11px;white-space:nowrap">${pct}%</span>
 </div></td>
 </tr>`;
-  }).join('');
+      }).join('');
 
-  return`<div>
+      return `<div>
 <h2 class="serif" style="font-size:18px;margin-bottom:6px">Estatísticas do Banco</h2>
 <p class="dim" style="font-size:13px;margin-bottom:18px">Visão geral do preenchimento por tema.</p>
 <div class="card" style="margin-bottom:16px">
 <div style="display:flex;gap:24px;flex-wrap:wrap">
 <div><p class="dim" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em">Total de Questões</p>
-<p class="gold serif" style="font-size:36px;font-weight:700;line-height:1.1">${stats.total?.toLocaleString()||0}</p></div>
+<p class="gold serif" style="font-size:36px;font-weight:700;line-height:1.1">${stats.total?.toLocaleString() || 0}</p></div>
 <div><p class="dim" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em">Temas</p>
 <p class="serif" style="font-size:36px;font-weight:700;line-height:1.1">${a.temas.length}</p></div>
 <div><p class="dim" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em">Trilhas</p>
@@ -1991,230 +3133,263 @@ function rAdmStats(){
 <div class="tbl-wrap"><table>
 <thead><tr><th style="width:36px"></th><th>Tema</th><th style="text-align:center">Questões</th><th style="text-align:center">Status</th><th style="min-width:180px">Preenchimento (meta: 10)</th></tr></thead>
 <tbody>${rows}</tbody>
-</table></div></div>`;}
+</table></div></div>`;
+    }
 
-// ═══════════════════════════════════════════════════════════
-// ADMIN — CRUD QUESTÕES
-// ═══════════════════════════════════════════════════════════
-function openNewQ(){
-  const a=S.adm;
-  document.getElementById('modal-title').textContent='Adicionar Questão';
-  document.getElementById('modal-err').innerHTML='';
-  document.getElementById('modal-save-btn').innerHTML='Salvar Questão';
-  const sel=document.getElementById('mf-tema');
-  sel.innerHTML=a.temas.map(t=>`<option value="${t._id}" ${t._id===a.selTema?'selected':''}>${t.icon||'✝'} ${t.name}</option>`).join('');
-  document.getElementById('mf-theme').value='';
-  document.getElementById('mf-question').value='';
-  ['a','b','c','d'].forEach(x=>document.getElementById('mf-'+x).value='');
-  document.querySelectorAll('input[name="mf_ans"]').forEach(r=>r.checked=false);
-  document.getElementById('mf-expl').value='';
-  S.adm.editingQ=null;
-  document.getElementById('qmodal').classList.add('open');
-}
+    // ═══════════════════════════════════════════════════════════
+    // ADMIN — CRUD QUESTÕES
+    // ═══════════════════════════════════════════════════════════
+    function openNewQ() {
+      const a = S.adm;
+      document.getElementById('modal-title').textContent = 'Adicionar Questão';
+      document.getElementById('modal-err').innerHTML = '';
+      document.getElementById('modal-save-btn').innerHTML = 'Salvar Questão';
+      const sel = document.getElementById('mf-tema');
+      sel.innerHTML = a.temas.map(t => `<option value="${t._id}" ${t._id === a.selTema ? 'selected' : ''}>${t.icon || '✝'} ${t.name}</option>`).join('');
+      document.getElementById('mf-theme').value = '';
+      document.getElementById('mf-question').value = '';
+      ['a', 'b', 'c', 'd'].forEach(x => document.getElementById('mf-' + x).value = '');
+      document.querySelectorAll('input[name="mf_ans"]').forEach(r => r.checked = false);
+      document.getElementById('mf-expl').value = '';
+      S.adm.editingQ = null;
+      document.getElementById('qmodal').classList.add('open');
+    }
 
-function openEditQ(id){
-  const q=S.adm.questions.find(x=>x._id===id);if(!q)return;
-  S.adm.editingQ=q;
-  document.getElementById('modal-title').textContent='Editar Questão';
-  document.getElementById('modal-err').innerHTML='';
-  document.getElementById('modal-save-btn').innerHTML='Salvar Alterações';
-  const a=S.adm;
-  const sel=document.getElementById('mf-tema');
-  sel.innerHTML=a.temas.map(t=>`<option value="${t._id}" ${t._id===q.trailId?'selected':''}>${t.icon||'✝'} ${t.name}</option>`).join('');
-  document.getElementById('mf-theme').value=q.theme||'';
-  document.getElementById('mf-question').value=q.question;
-  const opts=q.options||q.opts||[];
-  document.getElementById('mf-a').value=opts[0]||'';
-  document.getElementById('mf-b').value=opts[1]||'';
-  document.getElementById('mf-c').value=opts[2]||'';
-  document.getElementById('mf-d').value=opts[3]||'';
-  const ans=q.answer??q.ans;
-  document.querySelectorAll('input[name="mf_ans"]').forEach(r=>{r.checked=(+r.value===ans);});
-  document.getElementById('mf-expl').value=q.explanation||q.exp||'';
-  document.getElementById('qmodal').classList.add('open');
-}
+    function openEditQ(id) {
+      const q = S.adm.questions.find(x => x._id === id); if (!q) return;
+      S.adm.editingQ = q;
+      document.getElementById('modal-title').textContent = 'Editar Questão';
+      document.getElementById('modal-err').innerHTML = '';
+      document.getElementById('modal-save-btn').innerHTML = 'Salvar Alterações';
+      const a = S.adm;
+      const sel = document.getElementById('mf-tema');
+      sel.innerHTML = a.temas.map(t => `<option value="${t._id}" ${t._id === q.trailId ? 'selected' : ''}>${t.icon || '✝'} ${t.name}</option>`).join('');
+      document.getElementById('mf-theme').value = q.theme || '';
+      document.getElementById('mf-question').value = q.question;
+      const opts = q.options || q.opts || [];
+      document.getElementById('mf-a').value = opts[0] || '';
+      document.getElementById('mf-b').value = opts[1] || '';
+      document.getElementById('mf-c').value = opts[2] || '';
+      document.getElementById('mf-d').value = opts[3] || '';
+      const ans = q.answer ?? q.ans;
+      document.querySelectorAll('input[name="mf_ans"]').forEach(r => { r.checked = (+r.value === ans); });
+      document.getElementById('mf-expl').value = q.explanation || q.exp || '';
+      document.getElementById('qmodal').classList.add('open');
+    }
 
-async function saveQuestion(){
-  const err=document.getElementById('modal-err');err.innerHTML='';
-  const temaId=document.getElementById('mf-tema').value;
-  const theme=document.getElementById('mf-theme').value.trim();
-  const question=document.getElementById('mf-question').value.trim();
-  const options=[document.getElementById('mf-a').value.trim(),document.getElementById('mf-b').value.trim(),
-                 document.getElementById('mf-c').value.trim(),document.getElementById('mf-d').value.trim()];
-  const ansEl=document.querySelector('input[name="mf_ans"]:checked');
-  const answer=ansEl?+ansEl.value:-1;
-  const explanation=document.getElementById('mf-expl').value.trim();
+    async function saveQuestion() {
+      const err = document.getElementById('modal-err'); err.innerHTML = '';
+      const temaId = document.getElementById('mf-tema').value;
+      const theme = document.getElementById('mf-theme').value.trim();
+      const question = document.getElementById('mf-question').value.trim();
+      const options = [document.getElementById('mf-a').value.trim(), document.getElementById('mf-b').value.trim(),
+      document.getElementById('mf-c').value.trim(), document.getElementById('mf-d').value.trim()];
+      const ansEl = document.querySelector('input[name="mf_ans"]:checked');
+      const answer = ansEl ? +ansEl.value : -1;
+      const explanation = document.getElementById('mf-expl').value.trim();
 
-  if(!temaId){showErr(err,'Selecione um tema.');return;}
-  if(!question){showErr(err,'O enunciado é obrigatório.');return;}
-  if(options.some(o=>!o)){showErr(err,'Preencha as 4 alternativas (A, B, C, D).');return;}
-  if(answer<0){showErr(err,'Selecione a alternativa correta.');return;}
+      if (!temaId) { showErr(err, 'Selecione um tema.'); return; }
+      if (!question) { showErr(err, 'O enunciado é obrigatório.'); return; }
+      if (options.some(o => !o)) { showErr(err, 'Preencha as 4 alternativas (A, B, C, D).'); return; }
+      if (answer < 0) { showErr(err, 'Selecione a alternativa correta.'); return; }
 
-  const btn=document.getElementById('modal-save-btn');
-  btn.disabled=true;btn.innerHTML='<span class="spinner" style="width:14px;height:14px;border-width:2px"></span> Salvando...';
-  try{
-    const payload={temaId,theme,question,options,answer,explanation};
-    if(S.adm.editingQ){await api('PUT',`/api/admin/questions/${S.adm.editingQ._id}`,payload);}
-    else{await api('POST','/api/admin/questions',payload);}
-    toast(S.adm.editingQ?'Questão atualizada!':'Questão adicionada! ✓','tok');
-    document.getElementById('qmodal').classList.remove('open');
-    showLoad();await admLoad();hideLoad();render();
-  }catch(ex){showErr(err,ex.message);}
-  finally{btn.disabled=false;btn.innerHTML=S.adm.editingQ?'Salvar Alterações':'Salvar Questão';}
-}
+      const btn = document.getElementById('modal-save-btn');
+      btn.disabled = true; btn.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px"></span> Salvando...';
+      try {
+        const payload = { temaId, theme, question, options, answer, explanation };
+        if (S.adm.editingQ) { await api('PUT', `/api/admin/questions/${S.adm.editingQ._id}`, payload); }
+        else { await api('POST', '/api/admin/questions', payload); }
+        toast(S.adm.editingQ ? 'Questão atualizada!' : 'Questão adicionada! ✓', 'tok');
+        document.getElementById('qmodal').classList.remove('open');
+        showLoad(); await admLoad(); hideLoad(); render();
+      } catch (ex) { showErr(err, ex.message); }
+      finally { btn.disabled = false; btn.innerHTML = S.adm.editingQ ? 'Salvar Alterações' : 'Salvar Questão'; }
+    }
 
-function closeModal(e){
-  if(!e||e.target===document.getElementById('qmodal'))document.getElementById('qmodal').classList.remove('open');
-}
+    function closeModal(e) {
+      if (!e || e.target === document.getElementById('qmodal')) document.getElementById('qmodal').classList.remove('open');
+    }
 
-async function confirmDelQ(id,preview){
-  if(!confirm(`Excluir esta questão?\n\n"${preview}"\n\nEsta ação não pode ser desfeita.`))return;
-  showLoad();
-  try{
-    await api('DELETE',`/api/admin/questions/${id}`);
-    toast('Questão excluída.','tinfo');
-    await admLoad();hideLoad();render();
-  }catch(ex){hideLoad();toast(ex.message,'terr');}
-}
+    async function confirmDelQ(id, preview) {
+      if (!confirm(`Excluir esta questão?\n\n"${preview}"\n\nEsta ação não pode ser desfeita.`)) return;
+      showLoad();
+      try {
+        await api('DELETE', `/api/admin/questions/${id}`);
+        toast('Questão excluída.', 'tinfo');
+        await admLoad(); hideLoad(); render();
+      } catch (ex) { hideLoad(); toast(ex.message, 'terr'); }
+    }
 
-// ═══════════════════════════════════════════════════════════
-// ADMIN — CRUD TEMAS
-// ═══════════════════════════════════════════════════════════
-function openEditTema(id){
-  const t=S.adm.temas.find(x=>x._id===id);if(!t)return;
-  document.getElementById('tmodal-title').textContent=`Editar Tema`;
-  document.getElementById('tmodal-err').innerHTML='';
-  document.getElementById('tm-id').value=t._id;
-  document.getElementById('tm-icon').value=t.icon||'✝';
-  document.getElementById('tm-name').value=t.name||'';
-  document.getElementById('tm-desc').value=t.desc||'';
-  document.getElementById('tmodal').classList.add('open');
-}
+    // ═══════════════════════════════════════════════════════════
+    // ADMIN — CRUD TEMAS
+    // ═══════════════════════════════════════════════════════════
+    function openEditTema(id) {
+      const t = S.adm.temas.find(x => x._id === id); if (!t) return;
+      document.getElementById('tmodal-title').textContent = `Editar Tema`;
+      document.getElementById('tmodal-err').innerHTML = '';
+      document.getElementById('tm-id').value = t._id;
+      document.getElementById('tm-icon').value = t.icon || '✝';
+      document.getElementById('tm-name').value = t.name || '';
+      document.getElementById('tm-desc').value = t.desc || '';
+      document.getElementById('tmodal').classList.add('open');
+    }
 
-async function saveTema(){
-  const err=document.getElementById('tmodal-err');err.innerHTML='';
-  const id=document.getElementById('tm-id').value;
-  const name=document.getElementById('tm-name').value.trim();
-  const desc=document.getElementById('tm-desc').value.trim();
-  const icon=document.getElementById('tm-icon').value.trim();
-  if(!name){showErr(err,'Nome é obrigatório.');return;}
-  showLoad();
-  try{
-    await api('PUT',`/api/admin/temas/${id}`,{name,desc,icon});
-    toast('Tema atualizado!','tok');
-    document.getElementById('tmodal').classList.remove('open');
-    await admLoad();hideLoad();render();
-  }catch(ex){hideLoad();showErr(err,ex.message);}
-}
+    async function saveTema() {
+      const err = document.getElementById('tmodal-err'); err.innerHTML = '';
+      const id = document.getElementById('tm-id').value;
+      const name = document.getElementById('tm-name').value.trim();
+      const desc = document.getElementById('tm-desc').value.trim();
+      const icon = document.getElementById('tm-icon').value.trim();
+      if (!name) { showErr(err, 'Nome é obrigatório.'); return; }
+      showLoad();
+      try {
+        await api('PUT', `/api/admin/temas/${id}`, { name, desc, icon });
+        toast('Tema atualizado!', 'tok');
+        document.getElementById('tmodal').classList.remove('open');
+        await admLoad(); hideLoad(); render();
+      } catch (ex) { hideLoad(); showErr(err, ex.message); }
+    }
 
-function closeTemaModal(e){
-  if(!e||e.target===document.getElementById('tmodal'))document.getElementById('tmodal').classList.remove('open');
-}
+    function closeTemaModal(e) {
+      if (!e || e.target === document.getElementById('tmodal')) document.getElementById('tmodal').classList.remove('open');
+    }
 
-// ═══════════════════════════════════════════════════════════
-// ADMIN — CRUD TRILHAS
-// ═══════════════════════════════════════════════════════════
-let _ntTemaCount=0;
+    // ═══════════════════════════════════════════════════════════
+    // ADMIN — CRUD TRILHAS
+    // ═══════════════════════════════════════════════════════════
+    let _ntTemaCount = 0;
 
-function openNtModal(){
-  _ntTemaCount=0;
-  document.getElementById('ntmodal-err').innerHTML='';
-  document.getElementById('nt-icon').value='🎯';
-  document.getElementById('nt-name').value='';
-  document.getElementById('nt-desc').value='';
-  document.getElementById('nt-temas-list').innerHTML='';
-  addTemaRow(); addTemaRow(); // começa com 2 linhas
-  document.getElementById('ntmodal').classList.add('open');
-}
+    function openNtModal() {
+      _ntTemaCount = 0;
+      document.getElementById('ntmodal-err').innerHTML = '';
+      document.getElementById('nt-icon').value = '🎯';
+      document.getElementById('nt-name').value = '';
+      document.getElementById('nt-desc').value = '';
+      document.getElementById('nt-temas-list').innerHTML = '';
+      addTemaRow(); addTemaRow(); // começa com 2 linhas
+      document.getElementById('ntmodal').classList.add('open');
+    }
 
-function addTemaRow(){
-  if(_ntTemaCount>=10)return;
-  _ntTemaCount++;
-  const n=_ntTemaCount;
-  const row=document.createElement('div');
-  row.className='tema-row';
-  row.id=`nt-tema-row-${n}`;
-  row.innerHTML=`
+    function addTemaRow() {
+      if (_ntTemaCount >= 10) return;
+      _ntTemaCount++;
+      const n = _ntTemaCount;
+      const row = document.createElement('div');
+      row.className = 'tema-row';
+      row.id = `nt-tema-row-${n}`;
+      row.innerHTML = `
     <input class="fi" id="nt-t${n}-icon" type="text" maxlength="4" placeholder="✝" style="text-align:center">
     <input class="fi" id="nt-t${n}-name" type="text" maxlength="80" placeholder="Nome do Tema ${n}">
     <input class="fi" id="nt-t${n}-desc" type="text" maxlength="200" placeholder="Descrição (opcional)">
   `;
-  document.getElementById('nt-temas-list').appendChild(row);
-}
+      document.getElementById('nt-temas-list').appendChild(row);
+    }
 
-async function saveTrilha(){
-  const err=document.getElementById('ntmodal-err');err.innerHTML='';
-  const name=document.getElementById('nt-name').value.trim();
-  const icon=document.getElementById('nt-icon').value.trim();
-  const desc=document.getElementById('nt-desc').value.trim();
-  if(!name){showErr(err,'Informe o nome da trilha.');return;}
+    async function saveTrilha() {
+      const err = document.getElementById('ntmodal-err'); err.innerHTML = '';
+      const name = document.getElementById('nt-name').value.trim();
+      const icon = document.getElementById('nt-icon').value.trim();
+      const desc = document.getElementById('nt-desc').value.trim();
+      if (!name) { showErr(err, 'Informe o nome da trilha.'); return; }
 
-  const temas=[];
-  for(let i=1;i<=_ntTemaCount;i++){
-    const tname=document.getElementById(`nt-t${i}-name`)?.value.trim();
-    const ticon=document.getElementById(`nt-t${i}-icon`)?.value.trim();
-    const tdesc=document.getElementById(`nt-t${i}-desc`)?.value.trim();
-    if(tname) temas.push({name:tname,icon:ticon||'✝',desc:tdesc||''});
-  }
-  if(temas.length===0){showErr(err,'Adicione ao menos 1 tema com nome.');return;}
-
-  const btn=document.getElementById('nt-save-btn');
-  btn.disabled=true;btn.innerHTML='<span class="spinner" style="width:14px;height:14px;border-width:2px"></span> Criando...';
-  try{
-    await api('POST','/api/admin/trilhas',{name,icon,desc,temas});
-    toast('Trilha criada com sucesso! ✓','tok');
-    document.getElementById('ntmodal').classList.remove('open');
-    showLoad();await admLoad();hideLoad();render();
-  }catch(ex){showErr(err,ex.message);}
-  finally{btn.disabled=false;btn.innerHTML='Criar Trilha';}
-}
-
-function closeNtModal(e){
-  if(!e||e.target===document.getElementById('ntmodal'))document.getElementById('ntmodal').classList.remove('open');
-}
-
-// ═══════════════════════════════════════════════════════════
-// RENDER DISPATCH
-// ═══════════════════════════════════════════════════════════
-const SCREENS={login:rLogin,register:rRegister,forgot:rForgot,reset:rReset,
-  dashboard:rDash,quiz:rQuiz,stageEnd:rStageEnd,ranking:rRanking,admin:rAdmin};
-
-function render(){
-  document.getElementById('app').innerHTML=(SCREENS[S.screen]||rLogin)();
-}
-
-// ═══════════════════════════════════════════════════════════
-// UTILITÁRIOS
-// ═══════════════════════════════════════════════════════════
-function togglePwd(id){const el=document.getElementById(id);if(el)el.type=el.type==='password'?'text':'password';}
-
-// ═══════════════════════════════════════════════════════════
-// INICIALIZAÇÃO
-// ═══════════════════════════════════════════════════════════
-async function init(){
-  const params=new URLSearchParams(window.location.search);
-  if(params.get('action')==='reset'&&params.get('token')){
-    S.resetTok=params.get('token');history.replaceState({},'','/');S.screen='reset';render();return;
-  }
-  if(S.token){
-    showLoad();
-    try{
-      S.user=await api('GET','/api/auth/me');
-      localStorage.setItem('dsa_user',JSON.stringify(S.user));
-      if(S.user.role==='support'){await admLoad();S.screen='admin';}
-      else{
-        const [progress, trilhas]=await Promise.all([api('GET','/api/progress'),api('GET','/api/trilhas')]);
-        S.progress=progress;S.trilhas=trilhas;
-        S.trilha=trilhas.find(t=>!isTrilhaComplete(t,progress))||trilhas[0]||null;
-        S.screen='dashboard';
+      const temas = [];
+      for (let i = 1; i <= _ntTemaCount; i++) {
+        const tname = document.getElementById(`nt-t${i}-name`)?.value.trim();
+        const ticon = document.getElementById(`nt-t${i}-icon`)?.value.trim();
+        const tdesc = document.getElementById(`nt-t${i}-desc`)?.value.trim();
+        if (tname) temas.push({ name: tname, icon: ticon || '✝', desc: tdesc || '' });
       }
-    }catch{clearAuth();S.screen='login';}
-    hideLoad();
-  }else{S.screen='login';}
-  render();
-}
+      if (temas.length === 0) { showErr(err, 'Adicione ao menos 1 tema com nome.'); return; }
 
-init();
-</script>
+      const btn = document.getElementById('nt-save-btn');
+      btn.disabled = true; btn.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px"></span> Criando...';
+      try {
+        await api('POST', '/api/admin/trilhas', { name, icon, desc, temas });
+        toast('Trilha criada com sucesso! ✓', 'tok');
+        document.getElementById('ntmodal').classList.remove('open');
+        showLoad(); await admLoad(); hideLoad(); render();
+      } catch (ex) { showErr(err, ex.message); }
+      finally { btn.disabled = false; btn.innerHTML = 'Criar Trilha'; }
+    }
+
+    function closeNtModal(e) {
+      if (!e || e.target === document.getElementById('ntmodal')) document.getElementById('ntmodal').classList.remove('open');
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // RENDER DISPATCH
+    // ═══════════════════════════════════════════════════════════
+    const SCREENS = {
+      adminLogin: rAdminLogin, reset: rReset,
+      dashboard: rDash, quiz: rQuiz, stageEnd: rStageEnd, admin: rAdmin
+    };
+
+    function render() {
+      document.getElementById('app').innerHTML = (SCREENS[S.screen] || rLogin)();
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // UTILITÁRIOS
+    // ═══════════════════════════════════════════════════════════
+    function togglePwd(id) { const el = document.getElementById(id); if (el) el.type = el.type === 'password' ? 'text' : 'password'; }
+
+    // ═══════════════════════════════════════════════════════════
+    // PROGRESSO LOCAL (localStorage — sem login)
+    // ═══════════════════════════════════════════════════════════
+    function loadLocalProgress() {
+      try { return JSON.parse(localStorage.getItem('dsa_progress') || '[]'); } catch { return []; }
+    }
+    function saveLocalProgress(trilhaId, temaIndex, data) {
+      const all = loadLocalProgress();
+      const idx = all.findIndex(p => p.trilha_id === trilhaId && p.tema_index === temaIndex);
+      const rec = { trilha_id: trilhaId, tema_index: temaIndex, ...data };
+      if (idx >= 0) { if (!all[idx].completed || data.score > all[idx].score) all[idx] = rec; }
+      else all.push(rec);
+      localStorage.setItem('dsa_progress', JSON.stringify(all));
+      return all;
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // INICIALIZAÇÃO
+    // ═══════════════════════════════════════════════════════════
+    async function init() {
+      const params = new URLSearchParams(window.location.search);
+
+      // Rota de reset de senha (via link de e-mail)
+      if (params.get('action') === 'reset' && params.get('token')) {
+        S.resetTok = params.get('token'); history.replaceState({}, '', '/'); S.screen = 'reset'; render(); return;
+      }
+
+      // Acesso admin via ?admin=1 ou token de suporte existente
+      if (params.get('admin') === '1' || (S.token && S.user?.role === 'support')) {
+        if (S.token) {
+          showLoad();
+          try {
+            S.user = await api('GET', '/api/auth/me');
+            if (S.user.role === 'support') { await admLoad(); S.screen = 'admin'; render(); hideLoad(); return; }
+          } catch { clearAuth(); }
+          hideLoad();
+        }
+        S.screen = 'adminLogin'; render(); return;
+      }
+
+      // Fluxo principal — sem login
+      showLoad();
+      try {
+        const trilhas = await api('GET', '/api/trilhas');
+        S.trilhas  = trilhas;
+        S.progress = loadLocalProgress();
+        S.trilha   = trilhas.find(t => !isTrilhaComplete(t, S.progress)) || trilhas[0] || null;
+        S.screen   = 'dashboard';
+      } catch (e) {
+        toast('Erro ao carregar trilhas: ' + e.message, 'terr');
+        S.screen = 'dashboard';
+      }
+      hideLoad(); render();
+    }
+
+    init();
+  </script>
 </body>
+
 </html>
