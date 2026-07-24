@@ -1317,6 +1317,11 @@
       </div>
 
       <div class="fg">
+        <label class="fl">URL da Imagem <span class="dim" style="font-weight:400">(opcional — para questões com foto)</span></label>
+        <input class="fi" id="mf-image" type="url" placeholder="https://upload.wikimedia.org/...">
+      </div>
+
+      <div class="fg">
         <label class="fl">Enunciado da Questão <span class="req">*</span></label>
         <textarea class="fi" id="mf-question" placeholder="Digite o enunciado completo da questão..."
           style="min-height:100px"></textarea>
@@ -1342,12 +1347,18 @@
       <div class="fg">
         <label class="fl">Resposta Correta <span class="req">*</span></label>
         <div style="display:flex;gap:12px;margin-top:4px" id="mf-answer-group">
-          ${['A','B','C','D'].map((l,i)=>`
-          <label
-            style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1.5px solid var(--bdr);border-radius:var(--rsm);transition:var(--t);font-weight:600"
-            id="ans-lbl-${i}">
-            <input type="radio" name="mf_ans" value="${i}" style="accent-color:var(--gold)"> ${l}
-          </label>`).join('')}
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1.5px solid var(--bdr);border-radius:var(--rsm);font-weight:600" id="ans-lbl-0">
+            <input type="radio" name="mf_ans" value="0" style="accent-color:var(--gold)"> A
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1.5px solid var(--bdr);border-radius:var(--rsm);font-weight:600" id="ans-lbl-1">
+            <input type="radio" name="mf_ans" value="1" style="accent-color:var(--gold)"> B
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1.5px solid var(--bdr);border-radius:var(--rsm);font-weight:600" id="ans-lbl-2">
+            <input type="radio" name="mf_ans" value="2" style="accent-color:var(--gold)"> C
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1.5px solid var(--bdr);border-radius:var(--rsm);font-weight:600" id="ans-lbl-3">
+            <input type="radio" name="mf_ans" value="3" style="accent-color:var(--gold)"> D
+          </label>
         </div>
       </div>
 
@@ -1595,7 +1606,7 @@
         if (temaId) {
           const remote = await api('GET', `/api/quiz/${temaId}`);
           if (remote.length > 0) {
-            qs = remote.map(q => ({ id: q.id, theme: q.theme, question: q.question, opts: q.options, ans: q.answer, exp: q.explanation }));
+            qs = remote.map(q => ({ id: q.id, theme: q.theme, question: q.question, opts: q.options, ans: q.answer, exp: q.explanation, image: q.image || null }));
           }
         }
       } catch (_) { }
@@ -1881,7 +1892,7 @@ ${trilhaSelector}</div>
 <p class="dim" style="font-size:12px;margin-bottom:2px">Complete cada tema com &gt;${PASS_THR}% de acertos de 1ª tentativa para avançar</p>
 <div class="sg">${rows}</div>
 <div style="margin-top:24px;text-align:center">
-  <button onclick="goAdmin()" style="background:none;border:none;cursor:pointer;color:var(--dim2);font-size:11px;padding:6px 12px;opacity:.4">⚙</button>
+  <button onclick="goAdmin()" style="background:none;border:none;cursor:pointer;color:var(--gold);font-size:13px;padding:6px 12px;opacity:.75">⚙ Admin</button>
 </div>
 </div></div>`;
     }
@@ -1977,6 +1988,7 @@ ${last ? '✝ Finalizar Etapa' : 'Próxima Questão →'}</button></div>`;
 <span class="badge bw">${cur.theme}</span><span class="qval">Vale ${q.val} pt${q.val !== 1 ? 's' : ''}</span></div>
 <div class="card" style="margin-bottom:13px">
 <p class="dim" style="font-size:10px;margin-bottom:7px;text-transform:uppercase;letter-spacing:.06em">Questão ${q.ci + 1}</p>
+${cur.image ? `<div style="text-align:center;margin-bottom:12px"><img src="${cur.image}" alt="Santo" style="max-width:100%;max-height:260px;border-radius:10px;object-fit:cover;border:1px solid var(--bdr)"></div>` : ''}
 <p class="serif" style="font-size:16px;line-height:1.65">${cur.question}</p></div>
 ${opts}${fb}`;
     }
@@ -3147,6 +3159,7 @@ ${studyChapter('⚖', '10', 'Moral e Ética Cristã', [
       const sel = document.getElementById('mf-tema');
       sel.innerHTML = a.temas.map(t => `<option value="${t._id}" ${t._id === a.selTema ? 'selected' : ''}>${t.icon || '✝'} ${t.name}</option>`).join('');
       document.getElementById('mf-theme').value = '';
+      document.getElementById('mf-image').value = '';
       document.getElementById('mf-question').value = '';
       ['a', 'b', 'c', 'd'].forEach(x => document.getElementById('mf-' + x).value = '');
       document.querySelectorAll('input[name="mf_ans"]').forEach(r => r.checked = false);
@@ -3165,6 +3178,7 @@ ${studyChapter('⚖', '10', 'Moral e Ética Cristã', [
       const sel = document.getElementById('mf-tema');
       sel.innerHTML = a.temas.map(t => `<option value="${t._id}" ${t._id === q.trailId ? 'selected' : ''}>${t.icon || '✝'} ${t.name}</option>`).join('');
       document.getElementById('mf-theme').value = q.theme || '';
+      document.getElementById('mf-image').value = q.image || '';
       document.getElementById('mf-question').value = q.question;
       const opts = q.options || q.opts || [];
       document.getElementById('mf-a').value = opts[0] || '';
@@ -3187,6 +3201,7 @@ ${studyChapter('⚖', '10', 'Moral e Ética Cristã', [
       const ansEl = document.querySelector('input[name="mf_ans"]:checked');
       const answer = ansEl ? +ansEl.value : -1;
       const explanation = document.getElementById('mf-expl').value.trim();
+      const image = document.getElementById('mf-image').value.trim() || null;
 
       if (!temaId) { showErr(err, 'Selecione um tema.'); return; }
       if (!question) { showErr(err, 'O enunciado é obrigatório.'); return; }
@@ -3196,7 +3211,7 @@ ${studyChapter('⚖', '10', 'Moral e Ética Cristã', [
       const btn = document.getElementById('modal-save-btn');
       btn.disabled = true; btn.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px"></span> Salvando...';
       try {
-        const payload = { temaId, theme, question, options, answer, explanation };
+        const payload = { temaId, theme, question, options, answer, explanation, image };
         if (S.adm.editingQ) { await api('PUT', `/api/admin/questions/${S.adm.editingQ._id}`, payload); }
         else { await api('POST', '/api/admin/questions', payload); }
         toast(S.adm.editingQ ? 'Questão atualizada!' : 'Questão adicionada! ✓', 'tok');

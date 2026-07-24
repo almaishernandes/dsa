@@ -401,7 +401,8 @@ app.get('/api/quiz/:temaId', async (req, res) => {
     const shuffled = pool.sort(() => Math.random() - 0.5).slice(0, 10);
     res.json(shuffled.map(q => ({
       id: q._id, theme: q.theme, question: q.question,
-      options: q.options, answer: q.answer, explanation: q.explanation
+      options: q.options, answer: q.answer, explanation: q.explanation,
+      image: q.image || null
     })));
   } catch (e) { console.error(e); res.status(500).json({ error: 'Erro ao buscar questões.' }); }
 });
@@ -540,7 +541,7 @@ app.get('/api/admin/stats', adminGuard, async (req, res) => {
 
 app.post('/api/admin/questions', adminGuard, async (req, res) => {
   try {
-    const { temaId, theme, question, options, answer, explanation } = req.body;
+    const { temaId, theme, question, options, answer, explanation, image } = req.body;
     if (!temaId || !question?.trim())
       return res.status(400).json({ error: 'Tema e enunciado são obrigatórios.' });
     if (!Array.isArray(options) || options.length !== 4 || options.some(o => !o?.trim()))
@@ -555,7 +556,9 @@ app.post('/api/admin/questions', adminGuard, async (req, res) => {
       trailId: temaId, level: 1, stage: 1,
       theme: theme?.trim() || 'Geral', question: question.trim(),
       options: options.map(o => o.trim()), answer: +answer,
-      explanation: explanation?.trim() || '', createdAt: Date.now()
+      explanation: explanation?.trim() || '',
+      image: image?.trim() || null,
+      createdAt: Date.now()
     });
     res.status(201).json(q);
   } catch (e) { console.error(e); res.status(500).json({ error: 'Erro ao criar questão.' }); }
@@ -563,7 +566,7 @@ app.post('/api/admin/questions', adminGuard, async (req, res) => {
 
 app.put('/api/admin/questions/:id', adminGuard, async (req, res) => {
   try {
-    const { temaId, theme, question, options, answer, explanation } = req.body;
+    const { temaId, theme, question, options, answer, explanation, image } = req.body;
     if (!temaId || !question?.trim())
       return res.status(400).json({ error: 'Tema e enunciado são obrigatórios.' });
     if (!Array.isArray(options) || options.length !== 4 || options.some(o => !o?.trim()))
@@ -580,7 +583,8 @@ app.put('/api/admin/questions/:id', adminGuard, async (req, res) => {
         $set: {
           trailId: temaId, theme: theme?.trim() || 'Geral',
           question: question.trim(), options: options.map(o => o.trim()),
-          answer: +answer, explanation: explanation?.trim() || '', updatedAt: Date.now()
+          answer: +answer, explanation: explanation?.trim() || '',
+          image: image?.trim() || null, updatedAt: Date.now()
         }
       }
     );
