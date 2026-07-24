@@ -479,7 +479,7 @@ app.put('/api/admin/trilhas/:id', adminGuard, async (req, res) => {
       { _id: req.params.id },
       { $set: { name: name.trim(), icon: icon || '🎯', desc: desc || '', ...(temaIds ? { temaIds } : {}) } }
     );
-    if (!n.numReplaced) return res.status(404).json({ error: 'Trilha não encontrada.' });
+    if (!n.numAffected) return res.status(404).json({ error: 'Trilha não encontrada.' });
     res.json({ ok: true });
   } catch (e) { console.error(e); res.status(500).json({ error: 'Erro ao atualizar trilha.' }); }
 });
@@ -505,7 +505,7 @@ app.put('/api/admin/temas/:id', adminGuard, async (req, res) => {
       { _id: req.params.id },
       { $set: { name: name.trim(), icon: icon || '✝', desc: desc || '' } }
     );
-    if (!n.numReplaced) return res.status(404).json({ error: 'Tema não encontrado.' });
+    if (!n.numAffected) return res.status(404).json({ error: 'Tema não encontrado.' });
     res.json({ ok: true });
   } catch (e) { console.error(e); res.status(500).json({ error: 'Erro ao atualizar tema.' }); }
 });
@@ -588,7 +588,7 @@ app.put('/api/admin/questions/:id', adminGuard, async (req, res) => {
         }
       }
     );
-    if (!n.numReplaced) return res.status(404).json({ error: 'Questão não encontrada.' });
+    if (!n.numAffected) return res.status(404).json({ error: 'Questão não encontrada.' });
     res.json({ ok: true });
   } catch (e) { console.error(e); res.status(500).json({ error: 'Erro ao atualizar questão.' }); }
 });

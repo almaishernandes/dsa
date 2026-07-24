@@ -1398,6 +1398,30 @@
     </div>
   </div>
 
+  <!-- MODAL EDITAR TRILHA -->
+  <div id="etmodal" class="modal-bg" onclick="if(event.target===this)closeEtModal()">
+    <div class="modal-box" style="max-width:480px" onclick="event.stopPropagation()">
+      <h2 class="serif" style="font-size:18px;margin-bottom:16px">Editar Trilha</h2>
+      <div id="etmodal-err"></div>
+      <input type="hidden" id="et-id">
+      <div class="row2">
+        <div class="fg"><label class="fl">Ícone (emoji)</label>
+          <input class="fi" id="et-icon" type="text" maxlength="4" placeholder="🎯">
+        </div>
+        <div class="fg" style="flex:3"><label class="fl">Nome da Trilha <span class="req">*</span></label>
+          <input class="fi" id="et-name" type="text" placeholder="Ex: Santos da Igreja">
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Descrição</label>
+        <textarea class="fi" id="et-desc" style="min-height:70px"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+        <button class="btn btn-ghost" onclick="closeEtModal()">Cancelar</button>
+        <button class="btn btn-gold" onclick="saveEditTrilha()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL NOVA TRILHA -->
   <div id="ntmodal" class="modal-bg" onclick="closeNtModal(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
@@ -2914,8 +2938,9 @@ ${a.questions.length ? `<div class="tbl-wrap"><table>
 <span class="badge bw" style="margin-left:8px;font-size:10px;vertical-align:middle">Trilha ${trilha.code}</span>
 <strong style="font-size:16px;margin-left:8px;vertical-align:middle">${trilha.name}</strong>
 </div>
-<div style="text-align:right;flex-shrink:0">
+<div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
 <span style="font-size:13px;color:var(--gold);font-weight:700">${total} questões</span>
+<button style="background:none;border:1px solid var(--bdr);cursor:pointer;color:var(--dim);font-size:12px;padding:3px 8px;border-radius:4px" onclick="openEditTrilha('${trilha._id}')" title="Editar trilha">✏️ Editar</button>
 </div></div>
 <p class="dim" style="font-size:12px;margin-bottom:12px">${trilha.desc || ''}</p>
 <div>${temaRows || '<span class="dim" style="font-size:12px">Nenhum tema ainda.</span>'}</div>
@@ -2942,7 +2967,10 @@ ${cards || '<p class="dim" style="text-align:center;padding:40px 0">Nenhuma tril
     <h2 class="serif" style="font-size:18px">📖 Material de Estudo — Trilha 1</h2>
     <p class="dim" style="font-size:13px;margin-top:3px">Fundamentos da Fé · Conteúdo de apoio para o Desafio dos Servidores do Altar</p>
   </div>
-  <button class="btn btn-gold" onclick="window.print()" style="gap:8px">🖨 Imprimir / Salvar PDF</button>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn btn-gold" onclick="openStudyPreview()" style="gap:6px">👁 Visualizar e Imprimir</button>
+    <button class="btn btn-ghost" onclick="whatsappStudy()" style="gap:6px;color:#25D366;border-color:#25D366">💬 WhatsApp</button>
+  </div>
 </div>
 <div id="study-content" style="max-width:820px">
 
@@ -3039,6 +3067,41 @@ ${studyChapter('⚖', '10', 'Moral e Ética Cristã', [
 </div>
 
 <style>
+/* ── Modal de Preview do Material de Estudo ── */
+#study-preview-modal {
+  position: fixed; inset: 0; z-index: 9000;
+  background: #EDEBE6; display: flex; flex-direction: column; overflow: hidden;
+}
+.spm-bar {
+  background: #731828; color: #F8F3E8;
+  padding: 10px 20px; display: flex; align-items: center;
+  justify-content: space-between; gap: 12px; flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,.35);
+}
+.spm-title { font-family: Georgia,serif; font-size: 15px; font-weight: 600; }
+.spm-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.spm-btn {
+  border: none; padding: 7px 14px; border-radius: 4px;
+  cursor: pointer; font-size: 12px; font-weight: 600; font-family: system-ui;
+}
+.spm-wa    { background: #25D366; color: #fff; }
+.spm-print { background: #C8A84B; color: #1A0E0E; }
+.spm-close { background: rgba(255,255,255,.15); color: #F8F3E8; border: 1px solid rgba(255,255,255,.3) !important; }
+.spm-body  { flex: 1; overflow-y: auto; padding: 28px 16px; }
+.spm-page  {
+  max-width: 820px; margin: 0 auto; background: #fff;
+  padding: 36px 40px; border-radius: 6px;
+  box-shadow: 0 4px 24px rgba(0,0,0,.12);
+}
+/* Reapplica estilos dos tópicos para fundo branco */
+.spm-page { --gold:#C8A84B; --card:#FAFAF8; --bdr:#E0D4BE; --r:8px; --ice:#1A0E0E; --dim:#5A4A3A; }
+.spm-page .study-ch { background: #FAFAF8 !important; border: 1px solid #E0D4BE !important; }
+.spm-page .study-topic p:first-child { color: #C8A84B !important; }
+.spm-page .study-topic p:last-child  { color: #1A0E0E !important; }
+.spm-page h3.serif, .spm-page .serif { color: #C8A84B !important; }
+/* garante que o gradiente vinho imprima com cor */
+.spm-page div[style*="linear-gradient"] { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
 @media print {
   .admin-nav, .admin-nav *, button, .btn { display: none !important; }
   body { background: #fff !important; color: #111 !important; }
@@ -3109,12 +3172,24 @@ ${studyChapter('⚖', '10', 'Moral e Ética Cristã', [
 
     function rAdmStats() {
       const a = S.adm, stats = a.stats || { byTema: {}, byTrilha: {}, total: 0 };
+
+      // Mapeia cada temaId → trilha que o contém
+      const temaToTrilha = {};
+      (a.trilhas || []).forEach(tr => {
+        (tr.temaIds || []).forEach(tid => { temaToTrilha[tid] = tr; });
+      });
+
       const rows = a.temas.map(t => {
         const count = stats.byTema?.[t._id] || 0;
-        const pct = Math.round(Math.min(100, count / 10 * 100));
+        const pct   = Math.round(Math.min(100, count / 10 * 100));
+        const trilha = temaToTrilha[t._id];
+        const trilhaCell = trilha
+          ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;background:rgba(115,24,40,.18);color:var(--gold);border:1px solid rgba(200,168,75,.25);border-radius:4px;padding:2px 7px;white-space:nowrap">${trilha.icon || '🗺'} ${trilha.name}</span>`
+          : `<span class="dim" style="font-size:11px">—</span>`;
         return `<tr>
 <td><span style="font-size:18px">${t.icon || '✝'}</span></td>
 <td><strong>${t.name}</strong></td>
+<td>${trilhaCell}</td>
 <td style="text-align:center;font-weight:700;color:var(--gold)">${count}</td>
 <td style="text-align:center"><span class="badge ${count >= 10 ? 'bo' : count > 0 ? 'bw' : 'be'}" style="font-size:10px">${count >= 10 ? '✓ OK' : count > 0 ? `${count}/10` : 'Vazio'}</span></td>
 <td style="min-width:140px">
@@ -3138,7 +3213,14 @@ ${studyChapter('⚖', '10', 'Moral e Ética Cristã', [
 <p class="serif" style="font-size:36px;font-weight:700;line-height:1.1">${a.trilhas.length}</p></div>
 </div></div>
 <div class="tbl-wrap"><table>
-<thead><tr><th style="width:36px"></th><th>Tema</th><th style="text-align:center">Questões</th><th style="text-align:center">Status</th><th style="min-width:180px">Preenchimento (meta: 10)</th></tr></thead>
+<thead><tr>
+  <th style="width:36px"></th>
+  <th>Tema</th>
+  <th>Trilha</th>
+  <th style="text-align:center">Questões</th>
+  <th style="text-align:center">Status</th>
+  <th style="min-width:180px">Preenchimento (meta: 10)</th>
+</tr></thead>
 <tbody>${rows}</tbody>
 </table></div></div>`;
     }
@@ -3324,6 +3406,165 @@ ${studyChapter('⚖', '10', 'Moral e Ética Cristã', [
 
     function closeNtModal(e) {
       if (!e || e.target === document.getElementById('ntmodal')) document.getElementById('ntmodal').classList.remove('open');
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // ADMIN — EDITAR TRILHA
+    // ═══════════════════════════════════════════════════════════
+    function openEditTrilha(id) {
+      const t = S.adm.trilhas.find(x => x._id === id);
+      if (!t) return;
+      document.getElementById('etmodal-err').innerHTML = '';
+      document.getElementById('et-id').value = t._id;
+      document.getElementById('et-icon').value = t.icon || '🎯';
+      document.getElementById('et-name').value = t.name || '';
+      document.getElementById('et-desc').value = t.desc || '';
+      document.getElementById('etmodal').classList.add('open');
+    }
+
+    function closeEtModal() {
+      document.getElementById('etmodal').classList.remove('open');
+    }
+
+    async function saveEditTrilha() {
+      const err = document.getElementById('etmodal-err'); err.innerHTML = '';
+      const id   = document.getElementById('et-id').value;
+      const name = document.getElementById('et-name').value.trim();
+      const icon = document.getElementById('et-icon').value.trim();
+      const desc = document.getElementById('et-desc').value.trim();
+      if (!name) { showErr(err, 'Nome é obrigatório.'); return; }
+      showLoad();
+      try {
+        await api('PUT', `/api/admin/trilhas/${id}`, { name, icon, desc });
+        toast('Trilha atualizada! ✓', 'tok');
+        closeEtModal();
+        await admLoad(); hideLoad(); render();
+      } catch (ex) { hideLoad(); showErr(err, ex.message); }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // MATERIAL DE ESTUDO — PREVIEW E COMPARTILHAR
+    // ═══════════════════════════════════════════════════════════
+    function openStudyPreview() {
+      const src = document.getElementById('study-content');
+      if (!src) return;
+
+      // Remove modal antigo se existir
+      document.getElementById('study-preview-modal')?.remove();
+
+      const modal = document.createElement('div');
+      modal.id = 'study-preview-modal';
+      modal.innerHTML = `
+        <div class="spm-bar">
+          <span class="spm-title">📖 Material de Estudo — Trilha 1</span>
+          <div class="spm-actions">
+            <button class="spm-btn spm-wa" onclick="whatsappStudy()">💬 WhatsApp</button>
+            <button class="spm-btn spm-print" onclick="printStudy()">🖨 Imprimir / PDF</button>
+            <button class="spm-btn spm-close" onclick="closeStudyPreview()">✕ Fechar</button>
+          </div>
+        </div>
+        <div class="spm-body">
+          <div class="spm-page" id="spm-content"></div>
+        </div>`;
+
+      document.body.appendChild(modal);
+      document.getElementById('spm-content').innerHTML = src.innerHTML;
+    }
+
+    function closeStudyPreview() {
+      document.getElementById('study-preview-modal')?.remove();
+    }
+
+    function printStudy() {
+      const content = document.getElementById('spm-content');
+      if (!content) return;
+
+      // Clona o HTML e substitui variáveis CSS por valores fixos para impressão
+      let html = content.innerHTML;
+      html = html
+        .replace(/var\(--gold\)/g,  '#C8A84B')
+        .replace(/var\(--card\)/g,  '#FAFAF8')
+        .replace(/var\(--bdr\)/g,   '#E0D4BE')
+        .replace(/var\(--r\)/g,     '8px')
+        .replace(/var\(--ice\)/g,   '#1A0E0E')
+        .replace(/var\(--dim\)/g,   '#5A4A3A')
+        // cabeçalho dos temas: troca gradiente translúcido por sólido imprimível
+        .replace(/background:linear-gradient\(135deg,rgba\(115,24,40,\.6\),rgba\(45,24,64,\.8\)\)/g,
+                 'background:linear-gradient(135deg,#731828,#4E1020)');
+
+      const win = window.open('', '_blank', 'width=960,height=800');
+      if (!win) { alert('Permita pop-ups para imprimir.'); return; }
+      win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>DSA — Material de Estudo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Georgia, 'Times New Roman', serif; color: #1A0E0E; background: #fff; padding: 36px 52px; }
+
+  /* ── Cabeçalho da página ── */
+  .print-header { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; padding-bottom: 16px; border-bottom: 2px solid #731828; }
+  .print-header-cross { font-size: 32px; color: #731828; }
+  .print-header-text h1 { font-size: 20px; color: #731828; font-weight: bold; }
+  .print-header-text p  { font-size: 12px; color: #7A5A4A; letter-spacing: .04em; margin-top: 3px; font-family: system-ui, sans-serif; }
+
+  /* ── Cards de capítulo ── */
+  .study-ch {
+    border: 1px solid #E0D4BE; border-radius: 8px;
+    margin-bottom: 18px; overflow: hidden; page-break-inside: avoid;
+    background: #FAFAF8;
+  }
+  /* Cabeçalho do capítulo — sobrescreve inline style */
+  .study-ch > div:first-child,
+  [class*="study-ch-hdr"],
+  div[style*="linear-gradient"] {
+    background: linear-gradient(135deg,#731828,#4E1020) !important;
+    padding: 14px 20px !important;
+    display: flex !important; align-items: center !important; gap: 12px !important;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .study-ch span[style*="font-size:28px"] { font-size: 26px !important; }
+  .study-ch p[style*="rgba(200,168,75"] { color: rgba(200,168,75,.9) !important; font-size: 10px !important; text-transform: uppercase; letter-spacing: .1em; }
+  .study-ch h3, .study-ch .serif { font-size: 17px !important; color: #C8A84B !important; font-weight: bold; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  /* Tópicos */
+  .study-topic { padding: 11px 20px; border-bottom: 1px solid #E0D4BE; }
+  .study-topic:last-child { border-bottom: none; }
+  .study-topic p:first-child, .study-topic-title {
+    font-size: 11px !important; font-weight: 700; color: #731828 !important;
+    text-transform: uppercase; letter-spacing: .07em; margin-bottom: 5px;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .study-topic p:last-child { font-size: 13.5px; line-height: 1.8; color: #1A0E0E; }
+
+  /* Rodapé */
+  .print-footer { margin-top: 28px; padding-top: 12px; border-top: 1px solid #E0D4BE; text-align: center; font-size: 11px; color: #9A7A6A; font-family: system-ui, sans-serif; letter-spacing: .1em; }
+
+  @media print {
+    body { padding: 20px 32px; }
+    .study-ch { page-break-inside: avoid; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  }
+</style></head><body>
+
+<div class="print-header">
+  <span class="print-header-cross">✝</span>
+  <div class="print-header-text">
+    <h1>DSA — Material de Estudo · Trilha 1</h1>
+    <p>Fundamentos da Fé &nbsp;·&nbsp; Conteúdo de apoio para o Desafio dos Servidores do Altar</p>
+  </div>
+</div>
+
+${html}
+
+<div class="print-footer">✝ &nbsp; SERVIDORES DO ALTAR &nbsp; · &nbsp; dsa.servidoresdoaltar.site &nbsp; ✝</div>
+
+<script>window.onload = () => window.print();<\/script>
+</body></html>`);
+      win.document.close();
+    }
+
+    function whatsappStudy() {
+      const msg = '📖 *Material de Estudo — DSA*\n\nConfira o conteúdo de apoio para o Desafio dos Servidores do Altar!\n\n🔗 https://dsa.servidoresdoaltar.site';
+      window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
     }
 
     // ═══════════════════════════════════════════════════════════
