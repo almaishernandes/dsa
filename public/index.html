@@ -12,7 +12,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="DSA">
   <link rel="manifest" href="/manifest.json">
-  <link rel="apple-touch-icon" href="/icon-192.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png">
   <style>
     *,
     *::before,
@@ -131,6 +131,7 @@
       justify-content: center;
       gap: 7px;
       padding: 10px 20px;
+      min-height: 44px;
       border-radius: var(--rsm);
       border: none;
       cursor: pointer;
@@ -227,6 +228,7 @@
 
     .btn-sm {
       padding: 7px 14px;
+      min-height: 44px;
       font-size: 13px
     }
 
@@ -251,7 +253,7 @@
       border: 1.5px solid var(--bdr);
       border-radius: var(--rsm);
       color: var(--ice);
-      font-size: 14px;
+      font-size: 16px;
       outline: none;
       transition: var(--t);
       font-family: inherit
@@ -282,9 +284,14 @@
 
     .pw-eye {
       position: absolute;
-      right: 11px;
+      right: 0;
       top: 50%;
       transform: translateY(-50%);
+      min-height: 44px;
+      width: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: none;
       border: none;
       cursor: pointer;
@@ -594,75 +601,85 @@
       flex-direction: row-reverse
     }
 
+    /* ── Etapas da trilha — cartão de crédito ── */
     .sc {
       flex: 1;
-      background: var(--card);
-      border: 1px solid var(--bdr);
-      border-radius: var(--r);
-      padding: 13px;
+      border: none;
+      border-radius: 14px;
+      padding: 0;
       cursor: pointer;
-      transition: var(--t);
+      transition: transform .18s ease, box-shadow .18s ease;
       position: relative;
       overflow: hidden;
-      min-width: 0
+      min-width: 0;
+      aspect-ratio: 1.586 / 1;
+      box-shadow: 0 4px 14px rgba(0,0,0,.35)
     }
 
-    .sc::before {
+    .sc-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      padding: 10px 12px
+    }
+
+    /* reflexo */
+    .sc::after {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: transparent
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.10) 0%, transparent 55%);
+      pointer-events: none;
+      z-index: 0
     }
 
-    .sc:hover:not(.locked) {
-      transform: translateY(-2px);
-      border-color: var(--gold)
+    /* estados */
+    .sc.locked  { opacity: .38; cursor: not-allowed }
+    .sc.locked-s{ background: linear-gradient(135deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%); box-shadow: 0 4px 14px rgba(0,0,0,.4) }
+
+    .sc:hover:not(.locked) { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 22px rgba(0,0,0,.45) }
+
+    .sc-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between
     }
 
-    .sc.locked {
-      opacity: .4;
-      cursor: not-allowed
+    .sc-chip {
+      width: 22px; height: 17px;
+      border-radius: 3px;
+      background: linear-gradient(135deg,#C8A84B,#e8c96b);
+      opacity: .8
     }
 
-    .sc.done {
-      border-color: var(--okl)
+    .sc-ico {
+      font-size: 18px;
+      line-height: 1;
+      filter: drop-shadow(0 1px 3px rgba(0,0,0,.4))
     }
 
-    .sc.done::before {
-      background: var(--okl)
-    }
-
-    .sc.avail {
-      border-color: var(--wine)
-    }
-
-    .sc.avail::before {
-      background: linear-gradient(90deg, var(--wine), var(--gold))
-    }
+    .sc-bottom { display: flex; flex-direction: column; gap: 1px }
 
     .sc-num {
-      font-size: 10px;
-      color: var(--dim);
+      font-size: 9px;
+      color: rgba(255,255,255,.5);
       text-transform: uppercase;
-      letter-spacing: .08em;
-      margin-bottom: 3px
+      letter-spacing: .1em
     }
 
     .sc-ttl {
       font-family: Georgia, serif;
-      font-size: 12px;
-      color: var(--ice);
+      font-size: 11px;
+      color: rgba(255,255,255,.95);
       font-weight: 600;
-      line-height: 1.3
+      line-height: 1.3;
+      text-shadow: 0 1px 3px rgba(0,0,0,.5)
     }
 
-    .sc-ico {
-      font-size: 17px;
-      margin-bottom: 5px
-    }
+    .sc.done .sc-num { color: rgba(100,220,130,.6) }
 
     .dhdr {
       background: linear-gradient(180deg, rgba(115, 24, 40, .55) 0%, transparent 100%);
@@ -700,21 +717,184 @@
       margin-top: 3px
     }
 
+    /* ── Pódio vertical (top 3) ── */
+    .podium-card {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      margin: 20px 0 16px;
+      padding: 28px 20px 22px;
+      background: linear-gradient(145deg,#3a2800 0%,#1e1400 40%,#0d0800 100%);
+      box-shadow: 0 6px 28px rgba(200,168,75,.22), 0 2px 8px rgba(0,0,0,.5);
+      border: 1px solid rgba(200,168,75,.18)
+    }
+
+    .podium-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(200,168,75,.07) 0%, transparent 55%);
+      pointer-events: none
+    }
+
+    .podium-title {
+      text-align: center;
+      font-family: Georgia, serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #C8A84B;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+      position: relative; z-index:1
+    }
+
+    .podium-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 10px;
+      position: relative; z-index:1
+    }
+
+    .podium-slot {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      flex: 1
+    }
+
+    .podium-slot.p1 { order: 2 }
+    .podium-slot.p2 { order: 1 }
+    .podium-slot.p3 { order: 3 }
+
+    .podium-medal { font-size: 28px; line-height: 1 }
+    .podium-slot.p1 .podium-medal { font-size: 36px }
+
+    .podium-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,.9);
+      text-align: center;
+      line-height: 1.3;
+      max-width: 80px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .podium-score {
+      font-family: Georgia, serif;
+      font-weight: 700;
+      color: #C8A84B;
+      font-size: 13px
+    }
+
+    .podium-slot.p1 .podium-score { font-size: 17px }
+
+    .podium-bar {
+      width: 100%;
+      border-radius: 6px 6px 0 0;
+      margin-top: 4px
+    }
+
+    .podium-slot.p1 .podium-bar { height: 48px; background: linear-gradient(180deg,#C8A84B,#8a6e2a) }
+    .podium-slot.p2 .podium-bar { height: 34px; background: linear-gradient(180deg,#9e9e9e,#5a5a5a) }
+    .podium-slot.p3 .podium-bar { height: 24px; background: linear-gradient(180deg,#a05a2c,#5a2c0a) }
+
+    .podium-base {
+      width: 100%;
+      height: 6px;
+      background: rgba(200,168,75,.25);
+      border-radius: 0 0 4px 4px;
+      margin-top: -1px
+    }
+
+    /* ── Ranking — cartão de crédito ── */
+    .rank-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 20px 0 40px
+    }
+
     .rkr {
+      position: relative;
+      border: none;
+      border-radius: 14px;
+      overflow: hidden;
+      aspect-ratio: 1.586 / 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 11px 13px;
+      box-shadow: 0 4px 14px rgba(0,0,0,.35);
+      background: linear-gradient(135deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%);
+      transition: transform .18s ease, box-shadow .18s ease
+    }
+
+    .rkr:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 22px rgba(0,0,0,.45) }
+
+    /* top 3 com cores de medalha */
+    .rkr.rank-1 { background: linear-gradient(135deg,#7a5c00 0%,#4a3800 55%,#1a1200 100%); box-shadow: 0 4px 18px rgba(200,168,75,.35) }
+    .rkr.rank-2 { background: linear-gradient(135deg,#3a3a3a 0%,#252525 55%,#111 100%); box-shadow: 0 4px 14px rgba(180,180,180,.2) }
+    .rkr.rank-3 { background: linear-gradient(135deg,#5a2800 0%,#3a1800 55%,#1a0800 100%); box-shadow: 0 4px 14px rgba(180,100,40,.25) }
+    .rkr.rank-mine { box-shadow: 0 0 0 2.5px #C8A84B, 0 6px 20px rgba(200,168,75,.3) }
+
+    .rkr::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg,rgba(255,255,255,.09) 0%,transparent 50%);
+      pointer-events: none
+    }
+
+    .rkr-top {
       display: flex;
       align-items: center;
-      gap: 11px;
-      padding: 13px 0;
-      border-bottom: 1px solid var(--bdr)
+      justify-content: space-between;
+      position: relative; z-index:1
     }
 
     .rkp {
-      font-size: 15px;
+      font-size: 22px;
       font-weight: 700;
       font-family: Georgia, serif;
-      min-width: 34px;
-      text-align: center
+      line-height: 1
     }
+
+    .rkr-score {
+      font-family: Georgia, serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #C8A84B;
+      line-height: 1
+    }
+
+    .rkr-bottom { position: relative; z-index:1 }
+
+    .rkr-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255,255,255,.95);
+      text-shadow: 0 1px 3px rgba(0,0,0,.5);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .rkr-sub {
+      font-size: 9px;
+      color: rgba(255,255,255,.45);
+      letter-spacing: .06em;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .rkr.rank-mine .rkr-sub { color: #C8A84B }
 
     .skip-bar {
       position: fixed;
@@ -904,9 +1084,112 @@
       animation: fadeIn .2s ease
     }
 
-    /* Trilha switcher */
+    /* Trilha selector — formato cartão de crédito */
+    .trilha-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px
+    }
+
+    .trilha-sel-card {
+      position: relative;
+      border: none;
+      border-radius: 14px;
+      padding: 0;
+      cursor: pointer;
+      aspect-ratio: 1.586 / 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform .18s ease, box-shadow .18s ease;
+      box-shadow: 0 4px 16px rgba(0,0,0,.35)
+    }
+
+    .trilha-sel-card:hover:not(.locked) {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 24px rgba(0,0,0,.45)
+    }
+
+    .trilha-sel-card.active {
+      box-shadow: 0 0 0 2.5px #C8A84B, 0 8px 24px rgba(200,168,75,.3)
+    }
+
+    .trilha-sel-card.locked { opacity: .45; cursor: not-allowed }
+
+    /* gradiente exclusivo por índice (até 6 trilhas) */
+    .trilha-sel-card:nth-child(1) { background: linear-gradient(135deg,#731828 0%,#4E1020 55%,#2D1840 100%) }
+    .trilha-sel-card:nth-child(2) { background: linear-gradient(135deg,#1a3a5c 0%,#0d2540 55%,#1a1040 100%) }
+    .trilha-sel-card:nth-child(3) { background: linear-gradient(135deg,#1a4d2e 0%,#0d3320 55%,#1a2010 100%) }
+    .trilha-sel-card:nth-child(4) { background: linear-gradient(135deg,#4a2800 0%,#2d1800 55%,#1a1000 100%) }
+    .trilha-sel-card:nth-child(5) { background: linear-gradient(135deg,#2d0a4e 0%,#1a0530 55%,#0d0018 100%) }
+    .trilha-sel-card:nth-child(6) { background: linear-gradient(135deg,#003a3a 0%,#002020 55%,#001010 100%) }
+
+    /* reflexo de luz */
+    .trilha-sel-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.12) 0%, transparent 50%);
+      pointer-events: none
+    }
+
+    .tsc-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      padding: 11px 13px
+    }
+
+    .tsc-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .tsc-chip {
+      width: 26px; height: 20px;
+      border-radius: 4px;
+      background: linear-gradient(135deg,#C8A84B,#e8c96b);
+      opacity: .85
+    }
+
+    .trilha-sel-icon {
+      font-size: 22px;
+      line-height: 1;
+      filter: drop-shadow(0 1px 3px rgba(0,0,0,.4))
+    }
+
+    .tsc-bottom { display: flex; flex-direction: column; gap: 1px }
+
+    .trilha-sel-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,.95);
+      letter-spacing: .04em;
+      line-height: 1.3;
+      text-shadow: 0 1px 3px rgba(0,0,0,.5);
+      text-align: left
+    }
+
+    .tsc-sub {
+      font-size: 9px;
+      color: rgba(255,255,255,.5);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      text-align: left
+    }
+
+    .trilha-sel-card.active .tsc-sub { color: #C8A84B }
+
+    /* Trilha switcher (chips — mantido para compatibilidade) */
     .trilha-tab {
       padding: 7px 16px;
+      min-height: 44px;
       border-radius: 99px;
       border: 1.5px solid var(--bdr2);
       cursor: pointer;
@@ -1027,6 +1310,10 @@
       padding-top: env(safe-area-inset-top);
     }
 
+    /* ── ADMIN: apenas desktop ─────────────────────────────────── */
+    .btn-admin-desktop { display: inline-block; }
+    @media(max-width:768px) { .btn-admin-desktop { display: none !important; } }
+
     /* ── MOBILE ≤ 600px ────────────────────────────────────────── */
     @media(max-width:600px) {
 
@@ -1038,10 +1325,9 @@
       /* estatísticas */
       .stg { grid-template-columns: 1fr 1fr }
 
-      /* cards de etapa — 2 colunas compactas */
-      .sc { padding: 10px }
-      .sc-ttl { font-size: 11px }
-      .sc-ico { font-size: 14px; margin-bottom: 3px }
+      /* cards de etapa mobile */
+      .sc-ttl { font-size: 10px }
+      .sc-ico { font-size: 15px }
 
       /* quiz */
       .ans { font-size: 13px; padding: 11px 12px }
@@ -1068,9 +1354,14 @@
       /* tema-row */
       .tema-row { grid-template-columns: 36px 1fr }
 
-      /* ranking */
-      .rkr { gap: 8px }
-      .rkp { min-width: 28px; font-size: 13px }
+      /* temas: 1 coluna, card ocupa tela toda */
+      .sr { flex-direction: column }
+      .sc { flex: none; width: 100% }
+
+      /* ranking mobile */
+      .rank-grid { grid-template-columns: 1fr 1fr; gap: 10px }
+      .rkr-name { font-size: 11px }
+      .rkr-score { font-size: 17px }
 
       /* resultado */
       .stv { font-size: 20px }
@@ -1465,6 +1756,14 @@
     // ═══════════════════════════════════════════════════════════
     const QPE = 10;   // Questões por etapa (tema)
     const SKIP_PEN = 10;
+    const TRILHA_GRADS = [
+      'linear-gradient(135deg,#731828 0%,#4E1020 55%,#2D1840 100%)',
+      'linear-gradient(135deg,#1a3a5c 0%,#0d2540 55%,#1a1040 100%)',
+      'linear-gradient(135deg,#1a4d2e 0%,#0d3320 55%,#1a2010 100%)',
+      'linear-gradient(135deg,#4a2800 0%,#2d1800 55%,#1a1000 100%)',
+      'linear-gradient(135deg,#2d0a4e 0%,#1a0530 55%,#0d0018 100%)',
+      'linear-gradient(135deg,#003a3a 0%,#002020 55%,#001010 100%)',
+    ];
     const BASE_VAL = 10;
     const PASS_THR = 50;
     const LETTERS = ['A', 'B', 'C', 'D'];
@@ -1583,6 +1882,7 @@
           }
           hideLoad();
         }
+        if (scr === 'ranking') { showLoad(); S.rankData = await api('GET', '/api/ranking'); hideLoad(); }
         if (scr === 'admin') { showLoad(); await admLoad(); hideLoad(); }
       } catch (e) {
         hideLoad();
@@ -1873,17 +2173,29 @@
 
       let trilhaSelector = '';
       if (S.trilhas.length > 1) {
-        trilhaSelector = `<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px">`;
-        S.trilhas.forEach((t, i) => {
+        trilhaSelector = `<div class="trilha-grid">`;
+        S.trilhas.forEach(t => {
           const isActive = t._id === trilha?._id;
-          trilhaSelector += `<button class="trilha-tab ${isActive ? 'active' : ''}" onclick="selectTrilha('${t._id}')">
-        ${t.icon || '✝'} ${t.name}</button>`;
+          const isLocked = !isActive && t.locked;
+            trilhaSelector += `<button class="trilha-sel-card ${isActive ? 'active' : ''} ${isLocked ? 'locked' : ''}" onclick="${isLocked ? '' : `selectTrilha('${t._id}')`}">
+            <div class="tsc-inner">
+              <div class="tsc-top">
+                <div class="tsc-chip"></div>
+                <span class="trilha-sel-icon">${t.icon || '✝'}</span>
+              </div>
+              <div class="tsc-bottom">
+                <span class="trilha-sel-name">${t.name}</span>
+                <span class="tsc-sub">${isActive ? 'Trilha ativa' : isLocked ? 'Bloqueada' : 'DSA'}</span>
+              </div>
+            </div>
+          </button>`;
         });
         trilhaSelector += '</div>';
       }
 
+      const trilhaIdx = S.trilhas.findIndex(t => t._id === trilha?._id);
       let rows = '';
-      for (let r = 0; r < 5; r++) { const s1 = r * 2, s2 = r * 2 + 1; rows += `<div class="sr">${tCard(s1, temas[s1], trilha)}${tCard(s2, temas[s2], trilha)}</div>`; }
+      for (let r = 0; r < 5; r++) { const s1 = r * 2, s2 = r * 2 + 1; rows += `<div class="sr">${tCard(s1, temas[s1], trilha, trilhaIdx)}${tCard(s2, temas[s2], trilha, trilhaIdx)}</div>`; }
 
       return `<div class="screen"><div class="dhdr"><div class="ctr">
 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
@@ -1897,7 +2209,9 @@ ${trilhaSelector}</div>
 <div style="text-align:right;flex-shrink:0">
 <p style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em">Pontuação</p>
 <p class="gold serif" style="font-size:32px;font-weight:700;line-height:1">${ts}</p>
-<p class="dim" style="font-size:10px">pontos</p></div></div>
+<p class="dim" style="font-size:10px">pontos</p>
+<button onclick="go('ranking')" style="background:none;border:none;cursor:pointer;color:var(--gold);font-size:11px;padding:4px 0;opacity:.85;margin-top:2px">🏆 Ranking</button>
+</div></div>
 <div style="margin-top:14px">
 <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--dim);margin-bottom:4px">
 <span>Trilha: <strong style="color:var(--ice)">${trilha?.name || '—'}</strong></span>
@@ -1912,7 +2226,7 @@ ${trilhaSelector}</div>
 <p class="dim" style="font-size:12px;margin-bottom:2px">Complete cada tema com &gt;${PASS_THR}% de acertos de 1ª tentativa para avançar</p>
 <div class="sg">${rows}</div>
 <div style="margin-top:24px;text-align:center">
-  <button onclick="goAdmin()" style="background:none;border:none;cursor:pointer;color:var(--gold);font-size:13px;padding:6px 12px;opacity:.75">⚙ Admin</button>
+  <button onclick="goAdmin()" class="btn-admin-desktop" style="background:none;border:none;cursor:pointer;color:var(--gold);font-size:13px;padding:6px 12px;opacity:.75">⚙ Admin</button>
 </div>
 </div></div>`;
     }
@@ -1928,15 +2242,26 @@ ${trilhaSelector}</div>
       S.screen = 'adminLogin'; render();
     }
 
-    function tCard(i, tema, trilha) {
-      if (!tema) return `<div style="flex:1"></div>`;
+    function tCard(i, tema, trilha, trilhaIdx) {
+      if (!tema) return `<div style="flex:1;min-height:80px"></div>`;
       const p = getProgT(trilha._id, i), done = !!p.completed;
-      return `<div class="sc ${done ? 'done' : 'avail'}" onclick="startStage(${i})">
-<div class="sc-ico">${done ? '✅' : tema.icon || '✝'}</div>
-<div class="sc-num">Etapa ${i + 1}</div><div class="sc-ttl">${tema.name}</div>
-${done ? `<div style="margin-top:6px"><span class="badge bo" style="font-size:10px">${p.score}pts</span>
-<span class="badge bw" style="font-size:10px;margin-left:3px">${Math.round(p.first_attempt_rate)}%</span></div>`
-          : `<div style="margin-top:6px"><span class="badge bw" style="font-size:10px">Disponível</span></div>`}
+      const grad = TRILHA_GRADS[(trilhaIdx >= 0 ? trilhaIdx : 0) % TRILHA_GRADS.length];
+      const bg = done ? grad + '; filter:brightness(.7) saturate(.6)' : grad;
+      const statusLabel = done
+        ? `<span style="font-size:9px;color:rgba(100,220,130,.85)">✓ ${p.score}pts · ${Math.round(p.first_attempt_rate)}%</span>`
+        : `<span style="font-size:9px;color:rgba(255,255,255,.5)">Disponível</span>`;
+      return `<div class="sc ${done ? 'done' : 'avail'}" style="background:${grad};${done ? 'filter:brightness(.65) saturate(.55)' : ''}" onclick="startStage(${i})">
+<div class="sc-inner">
+  <div class="sc-top">
+    <div class="sc-chip"></div>
+    <span class="sc-ico">${done ? '✅' : tema.icon || '✝'}</span>
+  </div>
+  <div class="sc-bottom">
+    <span class="sc-num">Etapa ${i + 1}</span>
+    <span class="sc-ttl">${tema.name}</span>
+    ${statusLabel}
+  </div>
+</div>
 </div>`;
     }
 
@@ -2055,22 +2380,51 @@ ${!r.passed ? `<button class="btn btn-wine btn-full" style="font-size:15px;paddi
     }
 
     function rRanking() {
-      const pos = i => { if (i === 0) return '🥇'; if (i === 1) return '🥈'; if (i === 2) return '🥉'; return `#${i + 1}`; };
-      const rows = S.rankData.map((u, i) => {
-        const mine = S.user && u.id === S.user.id, rl = roleLabel(u.role, u.role_custom), loc = [u.city, u.parish].filter(Boolean).join(' · ');
-        return `<div class="rkr" style="${mine ? 'background:rgba(200,168,75,.06);border-radius:8px;padding:13px 8px;margin:0 -8px' : ''}">
-<div class="rkp" style="${i < 3 ? 'font-size:22px' : 'color:var(--dim)'}">${pos(i)}</div>
-<div style="flex:1;min-width:0">
-<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
-<span style="font-weight:600;font-size:14px">${u.name}</span>
-${mine ? '<span class="badge bg" style="font-size:10px">Você</span>' : ''}</div>
-<div class="dim" style="font-size:11px;margin-top:2px">${rl} · ${loc}</div>
-<div class="dim" style="font-size:11px;margin-top:1px">${u.stages_done} tema${u.stages_done !== 1 ? 's' : ''} concluído${u.stages_done !== 1 ? 's' : ''}</div>
-</div>
-<div style="text-align:right;flex-shrink:0">
-<div class="gold serif" style="font-size:20px;font-weight:700">${u.total_score}</div>
-<div class="dim" style="font-size:11px">⏱ ${fmtTime(u.total_time)}</div></div></div>`;
+      const medals = ['🥇','🥈','🥉'];
+      const rankClass = i => ['rank-1','rank-2','rank-3'][i] || '';
+      const d = S.rankData;
+
+      // ── Pódio (top 3) ──
+      const podiumSlot = (rank, u) => {
+        if (!u) return `<div class="podium-slot p${rank+1}"><div class="podium-bar"></div><div class="podium-base"></div></div>`;
+        const mine = S.user && u.id === S.user.id;
+        return `<div class="podium-slot p${rank+1}">
+  <span class="podium-medal">${medals[rank]}</span>
+  <span class="podium-score">${u.total_score}<span style="font-size:9px;opacity:.7">pts</span></span>
+  <span class="podium-name">${u.name}${mine ? ' 👤' : ''}</span>
+  <div class="podium-bar"></div>
+  <div class="podium-base"></div>
+</div>`;
+      };
+
+      const podium = d.length ? `<div class="podium-card">
+  <div class="podium-title">✝ Primeiros Lugares</div>
+  <div class="podium-row">
+    ${podiumSlot(1, d[1])}
+    ${podiumSlot(0, d[0])}
+    ${podiumSlot(2, d[2])}
+  </div>
+</div>` : '';
+
+      // ── Grid (todos) ──
+      const rows = d.map((u, i) => {
+        const mine = S.user && u.id === S.user.id;
+        const rl = roleLabel(u.role, u.role_custom);
+        const loc = [u.city, u.parish].filter(Boolean).join(' · ');
+        const sub = [rl, loc, `${u.stages_done} tema${u.stages_done !== 1 ? 's' : ''}`].filter(Boolean).join(' · ');
+        return `<div class="rkr ${rankClass(i)} ${mine ? 'rank-mine' : ''}">
+  <div class="rkr-top">
+    <span class="rkp">${medals[i] || `#${i+1}`}</span>
+    <span class="rkr-score">${u.total_score}<span style="font-size:10px;opacity:.7"> pts</span></span>
+  </div>
+  <div class="rkr-bottom">
+    <div class="rkr-name">${u.name}${mine ? ' 👤' : ''}</div>
+    <div class="rkr-sub">${sub || 'DSA'}</div>
+    <div class="rkr-sub">⏱ ${fmtTime(u.total_time)}</div>
+  </div>
+</div>`;
       }).join('');
+
       return `<div class="screen">
 <div style="background:linear-gradient(180deg,rgba(115,24,40,.5) 0%,transparent 100%);padding:22px 0 16px;border-bottom:1px solid var(--bdr)">
 <div class="ctr"><div style="display:flex;align-items:center;gap:11px">
@@ -2079,7 +2433,9 @@ ${mine ? '<span class="badge bg" style="font-size:10px">Você</span>' : ''}</div
 <p class="dim" style="font-size:11px;margin-top:2px">Maior pontuação · desempate pelo menor tempo</p></div>
 </div></div></div>
 <div class="ctr" style="padding-bottom:40px">
-${S.rankData.length ? rows : '<p class="dim" style="text-align:center;padding:44px 0">Ainda não há participantes no ranking.</p>'}
+${d.length
+  ? podium + `<p class="dim" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin:4px 0 10px">Todos os participantes</p><div class="rank-grid">${rows}</div>`
+  : '<p class="dim" style="text-align:center;padding:44px 0">Ainda não há participantes no ranking.</p>'}
 </div></div>`;
     }
 
@@ -2110,6 +2466,12 @@ ${S.rankData.length ? rows : '<p class="dim" style="text-align:center;padding:44
     // ADMIN — RENDER PRINCIPAL
     // ═══════════════════════════════════════════════════════════
     function rAdmin() {
+      if (window.innerWidth <= 768) return `<div class="screen" style="justify-content:center;align-items:center;padding:32px;text-align:center">
+<div class="ctr-sm"><span style="font-size:48px">🖥️</span>
+<h2 class="serif gold" style="margin:16px 0 8px">Admin indisponível no celular</h2>
+<p class="dim" style="font-size:14px;line-height:1.6">O painel de administração é acessível apenas pelo computador.</p>
+<button class="btn btn-gold" style="margin-top:24px" onclick="S.screen='dashboard';render()">← Voltar</button>
+</div></div>`;
       const a = S.adm, tabs = [['questions', '📋 Questões'], ['trilhas', '🗺 Trilhas'], ['stats', '📊 Estatísticas'], ['study', '📖 Material de Estudo']];
       return `<div class="admin-layout">
 <nav class="admin-nav">
@@ -3136,6 +3498,12 @@ ${studyChapter('⚖', '10', 'Moral e Ética Cristã', [
 
     // ─── LOGIN DO ADMINISTRADOR (apenas suporte) ──────────────────
     function rAdminLogin() {
+      if (window.innerWidth <= 768) return `<div class="screen" style="justify-content:center;align-items:center;padding:32px;text-align:center">
+<div class="ctr-sm"><span style="font-size:48px">🖥️</span>
+<h2 class="serif gold" style="margin:16px 0 8px">Admin indisponível no celular</h2>
+<p class="dim" style="font-size:14px;line-height:1.6">O painel de administração é acessível apenas pelo computador.</p>
+<button class="btn btn-gold" style="margin-top:24px" onclick="S.screen='dashboard';render()">← Voltar</button>
+</div></div>`;
       return `<div class="screen" style="justify-content:center;align-items:center;padding:20px;background:radial-gradient(ellipse at top,rgba(115,24,40,.2) 0%,transparent 60%)">
 <div class="ctr-sm">
 <div class="logo-wrap"><span class="logo-cross serif">✝</span>
@@ -3572,7 +3940,7 @@ ${html}
     // ═══════════════════════════════════════════════════════════
     const SCREENS = {
       adminLogin: rAdminLogin, reset: rReset,
-      dashboard: rDash, quiz: rQuiz, stageEnd: rStageEnd, admin: rAdmin
+      dashboard: rDash, quiz: rQuiz, stageEnd: rStageEnd, admin: rAdmin, ranking: rRanking
     };
 
     function render() {
