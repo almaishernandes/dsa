@@ -12,7 +12,7 @@ jobs:
       - name: Checkout do repositório
         uses: actions/checkout@v4
 
-      - name: Deploy via FTPS para Hostinger
+      - name: Deploy via FTP para Hostinger
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -21,7 +21,7 @@ jobs:
           protocol: ftp
           port: 21
           local-dir: ./public/
-          server-dir: /domains/servidoresdoaltar.site/public_html/dsa/
+          server-dir: /public_html/dsa/
           dangerous-clean-slate: true
           exclude: |
             **/.git*
